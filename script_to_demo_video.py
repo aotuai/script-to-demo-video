@@ -264,6 +264,9 @@ async def main():
             if duration is None:
                 raise RuntimeError("Failed to get audio duration.")
             
+            # --- NEW: Save duration back to the current section ---
+            section['duration'] = duration
+            
             if not create_video_from_image(image_abs_path, duration, silent_video_path, verbose=args.verbose):
                 raise RuntimeError("Failed to create video from image.")
             
@@ -273,7 +276,17 @@ async def main():
             narrated_clips.append(narrated_clip_path)
 
         if narrated_clips:
-            concatenate_videos(narrated_clips, output_video_path, temp_dir, verbose=args.verbose)
+            success = concatenate_videos(narrated_clips, output_video_path, temp_dir, verbose=args.verbose)
+            
+            # --- NEW: Write updated JSON data back to file ---
+            if success:
+                logging.info(f"Updating '{args.script_file}' with calculated durations...")
+                try:
+                    with open(args.script_file, 'w') as f:
+                        json.dump(script_data, f, indent=4)
+                    logging.info("✅ JSON file successfully updated.")
+                except Exception as e:
+                    logging.error(f"Failed to write updated JSON to '{args.script_file}': {e}")
         else:
             logging.warning("No clips were generated to concatenate.")
 
