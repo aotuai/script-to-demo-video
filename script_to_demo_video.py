@@ -137,7 +137,7 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
 
     command = [
-        'ffmpeg', '-loop', '1', '-i', image_path, '-c:v', 'libx264', '-tune', 'stillimage',
+        'ffmpeg', '-nostdin', '-loop', '1', '-i', image_path, '-c:v', 'libx264', '-tune', 'stillimage',
         '-vf', video_filter, '-pix_fmt', 'yuv420p', '-t', str(duration), '-y', output_path
     ]
     
@@ -157,7 +157,7 @@ def create_video_from_video(input_video_path, duration, output_path, resolution=
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
 
     command = [
-        'ffmpeg', '-stream_loop', '-1', '-i', input_video_path, 
+        'ffmpeg', '-nostdin', '-stream_loop', '-1', '-i', input_video_path, 
         '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 
         '-an', '-t', str(duration), '-y', output_path
     ]
@@ -174,7 +174,7 @@ def combine_video_and_audio(video_path, audio_path, output_path, verbose=False):
     """Merges a silent video clip with an audio file."""
     logging.info(f"Combining visual clip and audio.")
     command = [
-        'ffmpeg', '-i', video_path, '-i', audio_path, '-c:v', 'copy',
+        'ffmpeg', '-nostdin', '-i', video_path, '-i', audio_path, '-c:v', 'copy',
         '-c:a', 'aac', '-shortest', '-y', output_path
     ]
     
@@ -236,7 +236,12 @@ async def main():
         if args.engine == 'edge':
             await display_voices()
         else:
-            logging.warning("Voice listing is only available for the 'edge' engine. Run without --engine kokoro.")
+            print("--- Available TTS Voices (Kokoro Local) ---")
+            print("American Female: af_heart, af_alloy, af_aoede, af_bella, af_jessica, af_kore, af_nicole, af_nova, af_river, af_sky")
+            print("American Male:   am_fenrir, am_adam, am_echo, am_eric, am_liam, am_michael, am_onyx, am_puck, am_santa")
+            print("British Female:  bf_alice, bf_emma, bf_isabella, bf_lily")
+            print("British Male:    bm_daniel, bm_fable, bm_george, bm_lewis")
+            print("\nUse the exact name with the --voice flag. Example: --voice am_michael")
         sys.exit(0)
     
     if not args.script_file:
