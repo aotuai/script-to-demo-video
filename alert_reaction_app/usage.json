@@ -1,114 +1,142 @@
 [
-  {
-    "text": "Welcome to the Alert Reaction App. This application connects to your BrainFrame server to trigger real-world actions—like sending email alerts, playing sounds, and retrieving video clips—when an alarm is triggered.",
-    "image": "assets/live_tab.png"
-  },
-  {
-    "text": "Before we begin, please ensure both your BrainFrame Server and the Alert Reaction App are installed and configured as described in the deployment guide.",
-    "image": "assets/live_tab.png"
-  },
-  {
-    "text": "In this video, we'll walk through each tab to show you how to use the app.",
-    "image": "assets/live_tab.png"
-  },
-  {
-    "text": "Let's start with the main monitoring tabs.",
-    "image": "assets/live_tab.png"
-  },
-  {
-    "text": "The Live tab is your central dashboard. It shows you a real-time overview of activity, triggered notifications, and sound effects for each of your camera streams.",
-    "image": "assets/live_tab.png"
-  },
-  {
-    "text": "The Alerts tab provides a detailed log of every triggered alert, including all notifications and sound effects. You can filter by camera, reaction type, and date to investigate specific events.",
-    "image": "assets/alerts_tab.png"
-  },
-  {
-    "text": "The Activity tab shows the complete history of all events detected by BrainFrame, such as objects entering or leaving a zone, even if they didn't trigger a reaction. This is useful for a comprehensive review of everything the system has seen.",
-    "image": "assets/activity_tab.png"
-  },
-  {
-    "text": "On the Video Clips tab, you can view video segments that were automatically recorded from your NVR whenever an alert was triggered.",
-    "image": "assets/video_clips_tab.png"
-  },
-  {
-    "text": "Finally, the Parking tab allows you to upload a map of your parking lot and configure individual parking spaces to monitor their status.",
-    "image": "assets/parking_tab.png"
-  },
-  {
-    "text": "Now, let's look at how to set up your automated reactions.",
-    "image": "assets/alarms_tab.png"
-  },
-  {
-    "text": "The Alarms tab is the heart of the application. This is where you connect a specific BrainFrame alarm to the real-world actions you want to happen, such as adding multiple notifications or sound effects.",
-    "image": "assets/alarms_tab.png"
-  },
-  {
-    "text": "While notifications and sound effects are created from the Alarms tab, these dedicated tabs provide a simple list of every action you've configured across all alarms.",
-    "image": "assets/sound_effects_tab.png"
-  },
-  {
-    "text": "The Users tab is where you manage a directory of contacts, including their names, phone numbers, and email addresses. These contacts can then be selected as recipients for notifications.",
-    "image": "assets/users_tab.png"
-  },
-  {
-    "text": "The Sounds tab is your library for all audio clips. You can upload your own sound files, such as a warning message, or use the Text-to-Speech feature to generate audio directly from text.",
-    "image": "assets/sounds_tab.png"
-  },
-  {
-    "text": "The final group of tabs is for system-wide configuration.",
-    "image": "assets/storage_settings_tab_sign_in_with_google.png"
-  },
-  {
-    "text": "The Settings tab is for critical system parameters. First, provide a unique site name, which will be used as a prefix in the subject line of all emails.",
-    "image": "assets/storage_settings_tab_sign_in_with_google.png"
-  },
-  {
-    "text": "If you have an NVR, configure its IP address and model under the VIDEO RECORDER settings.",
-    "image": "assets/storage_settings_tab_sign_in_with_google.png"
-  },
-  {
-    "text": "You can also adjust the master volume for different types of audio, like sirens and voice announcements.",
-    "image": "assets/storage_settings_tab_sign_in_with_google.png"
-  },
-  {
-    "text": "Most importantly, you must authorize the application to send emails by clicking 'Sign in with Google'.",
-    "image": "assets/storage_settings_tab_sign_in_with_google.png"
-  },
-  {
-    "text": "When you click ‘Sign in with Google’, a new browser tab will open, asking you to choose an account.",
-    "image": "assets/storage_settings_tab_choose_an_account.png"
-  },
-  {
-    "text": "After selecting your account, Google will ask for permission for the app to 'Read, compose, and send emails from your Gmail account' and 'View and manage Pub/Sub topics and subscriptions'. Please click ‘Allow’ to continue.",
-    "image": "assets/storage_settings_tab_allow.png"
-  },
-  {
-    "text": "A new tab will confirm that the authentication was successful. You can now safely close this tab.",
-    "image": "assets/storage_settings_tab_successful.png"
-  },
-  {
-    "text": "Remember, this authorization must be done from the local machine. If you attempt it remotely, you will see an 'Access blocked' error, as shown.",
-    "image": "assets/storage_settings_tab_successful.png"
-  },
-  {
-    "text": "Once successful, the status will update to ‘Sender is Configured and ready.’ You can now use the 'Re-authorize' button if credentials expire, or the 'Sign out' button to disconnect the account.",
-    "image": "assets/storage_settings_tab_sender_is_configured_and_ready.png"
-  },
-  {
-    "text": "Clicking 'Sign out' will ask for confirmation before disconnecting your account.",
-    "image": "assets/storage_settings_tab_confirm_sign_out.png"
-  },
-  {
-    "text": "The Servers tab is where you configure the connection URLs for both the Alert Reaction backend and your BrainFrame server.",
-    "image": "assets/servers_tab.png"
-  },
-  {
-    "text": "The Language tab lets you switch the user interface between English and Chinese.",
-    "image": "assets/language_tab.png"
-  },
-  {
-    "text": "And finally, the Licenses tab displays the licenses for the open-source libraries used in this application.",
-    "image": "assets/licenses_tab.png"
-  }
+    {
+        "text": "Welcome to the Alert Reaction App. This application connects to your BrainFrame server to trigger real-world actions\u2014like sending email alerts, playing sounds, and retrieving video clips\u2014when an alarm is triggered.",
+        "image": "assets/live_tab.png",
+        "duration": 13.6
+    },
+    {
+        "text": "Before we begin, please ensure both your BrainFrame Server and the Alert Reaction App are installed and configured as described in the deployment guide.",
+        "image": "assets/live_tab.png",
+        "duration": 9.7
+    },
+    {
+        "text": "In this video, we'll walk through each tab to show you how to use the app.",
+        "image": "assets/live_tab.png",
+        "duration": 4.175
+    },
+    {
+        "text": "Let's start with the main monitoring tabs.",
+        "image": "assets/live_tab.png",
+        "duration": 2.675
+    },
+    {
+        "text": "The Live tab is your central dashboard. It shows you a real-time overview of activity, triggered notifications, and sound effects for each of your camera streams.",
+        "image": "assets/live_tab.png",
+        "duration": 10.225
+    },
+    {
+        "text": "The Alerts tab provides a detailed log of every triggered alert, including all notifications and sound effects. You can filter by camera, reaction type, and date to investigate specific events.",
+        "image": "assets/alerts_tab.png",
+        "duration": 12.9
+    },
+    {
+        "text": "The Activity tab shows the complete history of all events detected by BrainFrame, such as objects entering or leaving a zone, even if they didn't trigger a reaction. This is useful for a comprehensive review of everything the system has seen.",
+        "image": "assets/activity_tab.png",
+        "duration": 15.775
+    },
+    {
+        "text": "On the Video Clips tab, you can view video segments that were automatically recorded from your NVR whenever an alert was triggered.",
+        "image": "assets/video_clips_tab.png",
+        "duration": 8.4
+    },
+    {
+        "text": "Finally, the Parking tab allows you to upload a map of your parking lot and configure individual parking spaces to monitor their status.",
+        "image": "assets/parking_tab.png",
+        "duration": 8.725
+    },
+    {
+        "text": "Now, let's look at how to set up your automated reactions.",
+        "image": "assets/alarms_tab.png",
+        "duration": 3.775
+    },
+    {
+        "text": "The Alarms tab is the heart of the application. This is where you connect a specific BrainFrame alarm to the real-world actions you want to happen, such as adding multiple notifications or sound effects.",
+        "image": "assets/alarms_tab.png",
+        "duration": 12.925
+    },
+    {
+        "text": "While notifications and sound effects are created from the Alarms tab, these dedicated tabs provide a simple list of every action you've configured across all alarms.",
+        "image": "assets/sound_effects_tab.png",
+        "duration": 11.175
+    },
+    {
+        "text": "The Users tab is where you manage a directory of contacts, including their names, phone numbers, and email addresses. These contacts can then be selected as recipients for notifications.",
+        "image": "assets/users_tab.png",
+        "duration": 12.25
+    },
+    {
+        "text": "The Sounds tab is your library for all audio clips. You can upload your own sound files, such as a warning message, or use the Text-to-Speech feature to generate audio directly from text.",
+        "image": "assets/sounds_tab.png",
+        "duration": 12.225
+    },
+    {
+        "text": "The final group of tabs is for system-wide configuration.",
+        "image": "assets/storage_settings_tab_sign_in_with_google.png",
+        "duration": 3.975
+    },
+    {
+        "text": "The Settings tab is for critical system parameters. First, provide a unique site name, which will be used as a prefix in the subject line of all emails.",
+        "image": "assets/storage_settings_tab_sign_in_with_google.png",
+        "duration": 10.0
+    },
+    {
+        "text": "If you have an NVR, configure its IP address and model under the VIDEO RECORDER settings.",
+        "image": "assets/storage_settings_tab_sign_in_with_google.png",
+        "duration": 6.3
+    },
+    {
+        "text": "You can also adjust the master volume for different types of audio, like sirens and voice announcements.",
+        "image": "assets/storage_settings_tab_sign_in_with_google.png",
+        "duration": 6.625
+    },
+    {
+        "text": "Most importantly, you must authorize the application to send emails by clicking 'Sign in with Google'.",
+        "image": "assets/storage_settings_tab_sign_in_with_google.png",
+        "duration": 6.65
+    },
+    {
+        "text": "When you click \u2018Sign in with Google\u2019, a new browser tab will open, asking you to choose an account.",
+        "image": "assets/storage_settings_tab_choose_an_account.png",
+        "duration": 6.2
+    },
+    {
+        "text": "After selecting your account, Google will ask for permission for the app to 'Read, compose, and send emails from your Gmail account' and 'View and manage Pub/Sub topics and subscriptions'. Please click \u2018Allow\u2019 to continue.",
+        "image": "assets/storage_settings_tab_allow.png",
+        "duration": 14.175
+    },
+    {
+        "text": "A new tab will confirm that the authentication was successful. You can now safely close this tab.",
+        "image": "assets/storage_settings_tab_successful.png",
+        "duration": 6.575
+    },
+    {
+        "text": "Remember, this authorization must be done from the local machine. If you attempt it remotely, you will see an 'Access blocked' error, as shown.",
+        "image": "assets/storage_settings_tab_successful.png",
+        "duration": 9.225
+    },
+    {
+        "text": "Once successful, the status will update to \u2018Sender is Configured and ready.\u2019 You can now use the 'Re-authorize' button if credentials expire, or the 'Sign out' button to disconnect the account.",
+        "image": "assets/storage_settings_tab_sender_is_configured_and_ready.png",
+        "duration": 12.2
+    },
+    {
+        "text": "Clicking 'Sign out' will ask for confirmation before disconnecting your account.",
+        "image": "assets/storage_settings_tab_confirm_sign_out.png",
+        "duration": 4.875
+    },
+    {
+        "text": "The Servers tab is where you configure the connection URLs for both the Alert Reaction backend and your BrainFrame server.",
+        "image": "assets/servers_tab.png",
+        "duration": 8.2
+    },
+    {
+        "text": "The Language tab lets you switch the user interface between English and Chinese.",
+        "image": "assets/language_tab.png",
+        "duration": 5.325
+    },
+    {
+        "text": "And finally, the Licenses tab displays the licenses for the open-source libraries used in this application.",
+        "image": "assets/licenses_tab.png",
+        "duration": 7.125
+    }
 ]
