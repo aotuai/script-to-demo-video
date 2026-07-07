@@ -1,0 +1,11 @@
+[
+    {
+        "text": "Welcome to the IT Helpdesk tutorial on using BrainFrame AI.",
+        "media": "assets/homepage.png"
+    },
+    {
+        "text": "First, open the BrainFrame Webclient by typing the server's IP address into your browser's address bar. Press Enter.",
+        "media": "assets/brainframe-webclient.png"
+    }
+]
+
