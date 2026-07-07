@@ -200,7 +200,7 @@ async def main():
     )
     
     parser.add_argument("script_file", nargs='?', default=None, help="Path to the JSON file containing the script and media paths.")
-    parser.add_argument("output_video", nargs='?', default=None, help="Path for the final output video file (e.g., 'intro_video.mp4').")
+    parser.add_argument("output_video", nargs='?', default=None, help="Optional. Path for the final output video (defaults to script filename with .mp4).")
     
     parser.add_argument("--lang", default="en-US", help="Language-locale code for the voice (e.g., 'en-GB', 'es-MX').\nUsed if --voice is not set.")
     parser.add_argument("--gender", choices=['male', 'female'], default='male', help="Gender of the voice. Used if --voice is not set.")
@@ -215,8 +215,14 @@ async def main():
         await display_voices()
         sys.exit(0)
     
-    if not args.script_file or not args.output_video:
-        parser.error("The following arguments are required when not using --list-voices: script_file, output_video")
+    if not args.script_file:
+        parser.error("The 'script_file' argument is required when not using --list-voices.")
+
+    # --- NEW: Automatically determine output video name if missing ---
+    if not args.output_video:
+        base_name = os.path.splitext(args.script_file)[0]
+        args.output_video = f"{base_name}.mp4"
+        logging.info(f"No output video specified. Defaulting to: '{args.output_video}'")
 
     output_video_path = args.output_video
     known_extensions = ['.mp4', '.mov', '.mkv', '.avi', '.webm']
@@ -251,7 +257,6 @@ async def main():
 
     temp_dir = create_temp_directory()
     
-    # --- NEW: Create a directory specifically for exporting individual slide clips ---
     base_name = os.path.splitext(os.path.basename(output_video_path))[0]
     output_dir = os.path.dirname(os.path.abspath(output_video_path))
     slides_export_dir = os.path.join(output_dir, f"{base_name}_slides")
@@ -298,7 +303,6 @@ async def main():
             if not combine_video_and_audio(silent_video_path, audio_path, narrated_clip_path, verbose=args.verbose):
                 raise RuntimeError("Failed to combine video and audio.")
 
-            # --- NEW: Save the generated clip to the slides export folder ---
             slide_filename = f"slide_{i+1:02d}.mp4"
             slide_dest_path = os.path.join(slides_export_dir, slide_filename)
             shutil.copy2(narrated_clip_path, slide_dest_path)
