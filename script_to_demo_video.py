@@ -73,7 +73,6 @@ def validate_media_paths(script_data, script_dir):
     logging.info("--- Pre-flight Check: Validating all media paths... ---")
     all_found = True
     for i, section in enumerate(script_data):
-        # Support both 'media' and legacy 'image' keys
         media_path = section.get('media') or section.get('image')
         if not media_path:
             logging.warning(f"⚠️  Skipping section {i+1} in check: missing 'media' or 'image' key.")
@@ -139,8 +138,6 @@ def create_video_from_video(input_video_path, duration, output_path, resolution=
     width, height = resolution.split('x')
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
 
-    # -stream_loop -1 loops the video indefinitely. -t cuts it at exactly the audio duration.
-    # -an completely removes any native background audio from the input clip.
     command = [
         'ffmpeg', '-stream_loop', '-1', '-i', input_video_path, 
         '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 
@@ -253,15 +250,21 @@ async def main():
         sys.exit(1)
 
     temp_dir = create_temp_directory()
-    narrated_clips = []
     
+    # --- NEW: Create a directory specifically for exporting individual slide clips ---
+    base_name = os.path.splitext(os.path.basename(output_video_path))[0]
+    output_dir = os.path.dirname(os.path.abspath(output_video_path))
+    slides_export_dir = os.path.join(output_dir, f"{base_name}_slides")
+    os.makedirs(slides_export_dir, exist_ok=True)
+    logging.info(f"Individual slide clips will be saved to: '{slides_export_dir}'")
+    
+    narrated_clips = []
     video_extensions = ('.mp4', '.mov', '.avi', '.mkv', '.webm')
     
     try:
         for i, section in enumerate(script_data):
             logging.info(f"--- Processing Section {i+1}/{len(script_data)} ---")
             text = section.get('text')
-            # Fallback to 'image' key if 'media' is not used
             media_path = section.get('media') or section.get('image')
 
             if not text or not media_path:
@@ -282,7 +285,6 @@ async def main():
             
             section['duration'] = duration
             
-            # --- NEW: Check if media is video or image ---
             is_video = media_abs_path.lower().endswith(video_extensions)
             
             if is_video:
@@ -295,6 +297,12 @@ async def main():
             
             if not combine_video_and_audio(silent_video_path, audio_path, narrated_clip_path, verbose=args.verbose):
                 raise RuntimeError("Failed to combine video and audio.")
+
+            # --- NEW: Save the generated clip to the slides export folder ---
+            slide_filename = f"slide_{i+1:02d}.mp4"
+            slide_dest_path = os.path.join(slides_export_dir, slide_filename)
+            shutil.copy2(narrated_clip_path, slide_dest_path)
+            logging.info(f"✅ Exported individual slide to: '{slide_filename}'")
 
             narrated_clips.append(narrated_clip_path)
 
