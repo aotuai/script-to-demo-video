@@ -45,7 +45,7 @@ JSON
         "media": "assets/intro_slide.png"
     },
     {
-        "text": "First, open the Cisco AnyConnect client from your system tray. Enter your standard company credentials.",
+        "text": "First, open the BrainFrame Webclient by typing the server's IP address into your browser's address bar. Press Enter.",
         "media": "assets/login_step.mp4"
     }
 ]
@@ -59,11 +59,12 @@ Note on Durations: You do not need to provide timing! The tool will calculate th
 ## The "Perfect Timing" Workflow
 This tool is designed to make recording complex screencasts easy by breaking them down into manageable, pre-timed chunks.
 
-1. Draft the Script: Write your JSON file using placeholder images (like a blank PNG).
+1. Capture Screenshots: Take screenshots of every screen or slide in your demo. These act as visual placeholders and help guide your script.
+1. Draft the Script: Enter your script and the corresponding screenshot filenames into your JSON file in presentation order.
 1. Compile the Draft: Run the tool to generate the video and audio.
-1. Check the Slide Folder: The script automatically creates a [output_name]_slides folder containing a standalone .mp4 for every section.
-1. Record the Final Screen: Play slide_02.mp4, listen to the TTS audio, and record your actual screen to match that exact pacing.
-1. Update and Re-compile: Save your new screen recording over the placeholder asset (or update the JSON) and run the script one last time to stitch it all together.
+1. Review the Output: Locate the newly created [output_name]_slides folder, which contains an individual .mp4 for each section.
+1. Record the Final Screen: Play the generated slides (e.g., slide_02.mp4) to listen to the TTS audio. Use a screen recorder to capture your actual screen, matching your actions to the audio's pacing. (Note: We recommend the built-in Ubuntu screen recorder if you don't need system audio, or Kooha/OBS Studio if you do.)
+1. Update and Re-compile: Update the JSON with your new video recording and run the compilation script once more to finalize the video.
 
 ## Command Line Arguments
 You can customize the voice, volume, and output behavior using CLI flags.
@@ -78,16 +79,6 @@ You can customize the voice, volume, and output behavior using CLI flags.
 | --volume	| Volume adjustment for the TTS output. Use percentages.	| +0%
 | --list-voices	| Prints a formatted list of all available TTS voices and exits.	| None
 | --verbose	| Shows raw standard error output from FFmpeg for debugging.	| False
-
-Argument,Description,Default
-script_file,Path to the input JSON file.,Required
-output_video,Path to save the final stitched video.,Required
---voice,"The exact edge-tts voice shortname to use (e.g., en-US-AriaNeural). Overrides --lang and --gender.",None
---gender,"Target gender if searching for a voice automatically. Choices: male, female.",male
---lang,"Target locale if searching for a voice automatically (e.g., en-GB, es-MX).",en-US
---volume,Volume adjustment for the TTS output. Use percentages.,+0%
---list-voices,Prints a formatted list of all available TTS voices and exits.,None
---verbose,Shows raw standard error output from FFmpeg for debugging.,False
 
 ## Selecting a Voice
 To see all available voices, run:
