@@ -15,7 +15,6 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 # --- Helper Functions ---
 
-# --- NEW FUNCTION ---
 async def display_voices():
     """Lists all available voices from edge-tts in a readable format and exits."""
     print("--- Available TTS Voices ---")
@@ -23,7 +22,6 @@ async def display_voices():
     print("Or, use the 'Locale' and 'Gender' with the --lang and --gender flags.\n")
     try:
         voices = await edge_tts.list_voices()
-        # Sort voices by locale, then gender, then shortname for consistency
         voices = sorted(voices, key=lambda v: (v['Locale'], v['Gender'], v['ShortName']))
         
         for voice in voices:
@@ -70,23 +68,24 @@ def create_temp_directory(name="video_temp"):
     logging.info(f"Temporary directory '{name}' created.")
     return name
 
-def validate_image_paths(script_data, script_dir):
-    """Checks if all image files referenced in the script exist before starting."""
-    logging.info("--- Pre-flight Check: Validating all image paths... ---")
+def validate_media_paths(script_data, script_dir):
+    """Checks if all media files referenced in the script exist before starting."""
+    logging.info("--- Pre-flight Check: Validating all media paths... ---")
     all_found = True
     for i, section in enumerate(script_data):
-        image_path = section.get('image')
-        if not image_path:
-            logging.warning(f"⚠️  Skipping section {i+1} in check: missing 'image' key.")
+        # Support both 'media' and legacy 'image' keys
+        media_path = section.get('media') or section.get('image')
+        if not media_path:
+            logging.warning(f"⚠️  Skipping section {i+1} in check: missing 'media' or 'image' key.")
             continue
         
-        full_path = os.path.join(script_dir, image_path)
+        full_path = os.path.join(script_dir, media_path)
         if not os.path.exists(full_path):
-            logging.error(f"❌ FATAL: Image not found for section {i+1}: {full_path}")
+            logging.error(f"❌ FATAL: Media file not found for section {i+1}: {full_path}")
             all_found = False
             
     if all_found:
-        logging.info("✅ All image files were found.")
+        logging.info("✅ All media files were found.")
     else:
         logging.error("Please correct the paths in your JSON file before proceeding.")
     return all_found
@@ -94,7 +93,7 @@ def validate_image_paths(script_data, script_dir):
 async def generate_audio_from_text(text, voice, volume, output_path):
     """Generates an MP3 audio file from text using edge-tts."""
     try:
-        logging.info(f"Generating audio for: '{text[:50]}...' using voice '{voice}' and volume '{volume}'")
+        logging.info(f"Generating audio for: '{text[:50]}...' using voice '{voice}'")
         communicate = edge_tts.Communicate(text, voice, volume=volume)
         await communicate.save(output_path)
         return True
@@ -115,7 +114,7 @@ def get_audio_duration_seconds(audio_path):
 
 def create_video_from_image(image_path, duration, output_path, resolution="1920x1080", verbose=False):
     """Creates a silent video clip from a static image for a specific duration."""
-    logging.info(f"Creating video from '{image_path}' for {duration:.2f} seconds.")
+    logging.info(f"Creating video from image '{os.path.basename(image_path)}' for {duration:.2f} seconds.")
     
     width, height = resolution.split('x')
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
@@ -129,14 +128,36 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
         subprocess.run(command, check=True, capture_output=True)
         return True
     except subprocess.CalledProcessError as e:
-        logging.error(f"FFmpeg failed to create video from image. Command: {' '.join(command)}")
-        stderr_output = e.stderr.decode('utf-8', errors='ignore')
-        logging.error(f"\n--- FFmpeg Error Output ---\n{stderr_output}\n---------------------------\n")
+        logging.error(f"FFmpeg failed to create video from image.")
+        if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
+        return False
+
+def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", verbose=False):
+    """Processes an input video clip to fit the target duration and resolution (loops if too short)."""
+    logging.info(f"Processing input video '{os.path.basename(input_video_path)}' to fit {duration:.2f} seconds.")
+    
+    width, height = resolution.split('x')
+    video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
+
+    # -stream_loop -1 loops the video indefinitely. -t cuts it at exactly the audio duration.
+    # -an completely removes any native background audio from the input clip.
+    command = [
+        'ffmpeg', '-stream_loop', '-1', '-i', input_video_path, 
+        '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 
+        '-an', '-t', str(duration), '-y', output_path
+    ]
+    
+    try:
+        subprocess.run(command, check=True, capture_output=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        logging.error(f"FFmpeg failed to process input video.")
+        if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
 def combine_video_and_audio(video_path, audio_path, output_path, verbose=False):
     """Merges a silent video clip with an audio file."""
-    logging.info(f"Combining '{os.path.basename(video_path)}' and '{os.path.basename(audio_path)}'.")
+    logging.info(f"Combining visual clip and audio.")
     command = [
         'ffmpeg', '-i', video_path, '-i', audio_path, '-c:v', 'copy',
         '-c:a', 'aac', '-shortest', '-y', output_path
@@ -146,9 +167,8 @@ def combine_video_and_audio(video_path, audio_path, output_path, verbose=False):
         subprocess.run(command, check=True, capture_output=True)
         return True
     except subprocess.CalledProcessError as e:
-        logging.error(f"FFmpeg failed to combine video and audio. Command: {' '.join(command)}")
-        stderr_output = e.stderr.decode('utf-8', errors='ignore')
-        logging.error(f"\n--- FFmpeg Error Output ---\n{stderr_output}\n---------------------------\n")
+        logging.error(f"FFmpeg failed to combine video and audio.")
+        if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
 def concatenate_videos(video_paths, output_path, temp_dir, verbose=False):
@@ -171,20 +191,18 @@ def concatenate_videos(video_paths, output_path, temp_dir, verbose=False):
         logging.info(f"✅ Final video successfully created at '{output_path}'")
         return True
     except subprocess.CalledProcessError as e:
-        logging.error(f"FFmpeg failed to concatenate videos. Command: {' '.join(command)}")
-        stderr_output = e.stderr.decode('utf-8', errors='ignore')
-        logging.error(f"\n--- FFmpeg Error Output ---\n{stderr_output}\n---------------------------\n")
+        logging.error(f"FFmpeg failed to concatenate videos.")
+        if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
 async def main():
     """Main function to parse arguments and run the video creation pipeline."""
     parser = argparse.ArgumentParser(
-        description="Generate an introduction video from a text script and screenshots.",
-        formatter_class=argparse.RawTextHelpFormatter # Use RawTextHelpFormatter for better help text formatting
+        description="Generate a narrated video from a text script and media (images/videos).",
+        formatter_class=argparse.RawTextHelpFormatter
     )
-    # --- MODIFIED ARGUMENTS ---
-    # Positional args are now optional, we will validate them manually later
-    parser.add_argument("script_file", nargs='?', default=None, help="Path to the JSON file containing the script and image paths.")
+    
+    parser.add_argument("script_file", nargs='?', default=None, help="Path to the JSON file containing the script and media paths.")
     parser.add_argument("output_video", nargs='?', default=None, help="Path for the final output video file (e.g., 'intro_video.mp4').")
     
     parser.add_argument("--lang", default="en-US", help="Language-locale code for the voice (e.g., 'en-GB', 'es-MX').\nUsed if --voice is not set.")
@@ -192,20 +210,16 @@ async def main():
     parser.add_argument("--volume", default="+0%", help="Volume adjustment for the voice (e.g., '+10%%', '-5%%').")
     parser.add_argument("--voice", default=None, help="Exact voice name to use (e.g., 'en-GB-RyanNeural').\nOverrides --lang and --gender.")
     parser.add_argument("--verbose", action="store_true", help="Show detailed output from FFmpeg commands.")
-    # --- NEW ARGUMENT ---
     parser.add_argument("--list-voices", action="store_true", help="List all available voices from edge-tts and exit.")
     
     args = parser.parse_args()
 
-    # --- NEW LOGIC: Handle --list-voices flag ---
     if args.list_voices:
         await display_voices()
         sys.exit(0)
     
-    # If not listing voices, the positional arguments are required.
     if not args.script_file or not args.output_video:
         parser.error("The following arguments are required when not using --list-voices: script_file, output_video")
-    # --- END NEW LOGIC ---
 
     output_video_path = args.output_video
     known_extensions = ['.mp4', '.mov', '.mkv', '.avi', '.webm']
@@ -222,7 +236,6 @@ async def main():
         selected_voice = await find_voice(args.gender, args.lang)
         if not selected_voice:
             logging.error(f"Could not find an edge-tts voice for gender='{args.gender}' and lang='{args.lang}'.")
-            logging.error("Please try a different combination or run 'edge-tts --list-voices' to see available options.")
             sys.exit(1)
     
     logging.info(f"✅ Voice selected: {selected_voice}")
@@ -236,23 +249,26 @@ async def main():
 
     script_dir = os.path.dirname(os.path.abspath(args.script_file))
     
-    if not validate_image_paths(script_data, script_dir):
+    if not validate_media_paths(script_data, script_dir):
         sys.exit(1)
 
     temp_dir = create_temp_directory()
     narrated_clips = []
     
+    video_extensions = ('.mp4', '.mov', '.avi', '.mkv', '.webm')
+    
     try:
         for i, section in enumerate(script_data):
             logging.info(f"--- Processing Section {i+1}/{len(script_data)} ---")
             text = section.get('text')
-            image_path = section.get('image')
+            # Fallback to 'image' key if 'media' is not used
+            media_path = section.get('media') or section.get('image')
 
-            if not text or not image_path:
-                logging.warning(f"Skipping section {i+1} due to missing 'text' or 'image' key.")
+            if not text or not media_path:
+                logging.warning(f"Skipping section {i+1} due to missing 'text', 'media', or 'image' key.")
                 continue
             
-            image_abs_path = os.path.join(script_dir, image_path)
+            media_abs_path = os.path.join(script_dir, media_path)
             audio_path = os.path.join(temp_dir, f"audio_{i}.mp3")
             silent_video_path = os.path.join(temp_dir, f"silent_video_{i}.mp4")
             narrated_clip_path = os.path.join(temp_dir, f"narrated_clip_{i}.mp4")
@@ -264,11 +280,18 @@ async def main():
             if duration is None:
                 raise RuntimeError("Failed to get audio duration.")
             
-            # --- NEW: Save duration back to the current section ---
             section['duration'] = duration
             
-            if not create_video_from_image(image_abs_path, duration, silent_video_path, verbose=args.verbose):
-                raise RuntimeError("Failed to create video from image.")
+            # --- NEW: Check if media is video or image ---
+            is_video = media_abs_path.lower().endswith(video_extensions)
+            
+            if is_video:
+                success = create_video_from_video(media_abs_path, duration, silent_video_path, verbose=args.verbose)
+            else:
+                success = create_video_from_image(media_abs_path, duration, silent_video_path, verbose=args.verbose)
+                
+            if not success:
+                raise RuntimeError(f"Failed to process media file: {media_path}")
             
             if not combine_video_and_audio(silent_video_path, audio_path, narrated_clip_path, verbose=args.verbose):
                 raise RuntimeError("Failed to combine video and audio.")
@@ -278,7 +301,6 @@ async def main():
         if narrated_clips:
             success = concatenate_videos(narrated_clips, output_video_path, temp_dir, verbose=args.verbose)
             
-            # --- NEW: Write updated JSON data back to file ---
             if success:
                 logging.info(f"Updating '{args.script_file}' with calculated durations...")
                 try:
