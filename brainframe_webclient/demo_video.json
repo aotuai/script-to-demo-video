@@ -1,0 +1,116 @@
+[
+    {
+        "text": "Welcome to BrainFrame. BrainFrame is an AI platform built to deploy computer vision models at scale with connected cameras. Whether you need to connect thousands of cameras in a data center for enterprise business analytics, deploy automated safety & security monitoring across your company, or set up a private, autonomous AI security patrol for your own home, BrainFrame handles it all smoothly on-premise or in the cloud.",
+        "media": "assets/no_code_low_code.mp4",
+        "duration": 21.475,
+        "chapter": 1
+    },
+    {
+        "text": "In this video, we will demonstrate a smart traffic application with brainframe. You will see how to use virtual lines and zones to count bikes and vehicles, track speeds, directions, and trigger alerts. Let's jump into the setup.",
+        "media": "assets/line_region_alerts.mp4",
+        "duration": 14.425,
+        "chapter": 2
+    },
+    {
+        "text": "To access the BrainFrame Web Client, simply enter your machine's IP address into a browser. We recommend using the network IP rather than localhost to ensure communication across different application containers. Clicking the '+ New Stream' button opens the configuration window. BrainFrame supports IP cameras, local video files, and webcams out of the box. Just give your stream a name, paste the RTSP URL, and you're set. Advanced users can customize the video pipeline directly using their own GStreamer video stream configurations. After you add a video stream, you can click the video and then click 'Stream Config' to view your connection type, network address, and other stream configurations. [PAUSE 1.5]",
+        "media": "assets/webclient.mp4",
+        "duration": 40.775,
+        "chapter": 3
+    },
+    {
+        "text": "For this demo, we'll use the Use Case Library to simulate live RTSP streams. This app allows you to store, organize, and tag extensive video datasets for different scenarios, like warehouse safety or traffic analysis. Clicking the arrow next to an RTSP URL triggers a REST API call, adding that live video feed directly into BrainFrame. In enterprise environments with dozens of use cases, this tool lets developers simulate a massive, real-world production environment in parallel. Let's click the arrow on the far right to add two traffic simulation streams to our system.",
+        "media": "assets/use_case_library.mp4",
+        "duration": 36.175,
+        "chapter": 4
+    },
+    {
+        "text": "Swapping back to the main Web Client tab, our newly added streams appear in a thumbnail grid. Clicking any stream opens the Player View, placing the live feed front and center with your stream list on the left.",
+        "media": "assets/player.mp4",
+        "duration": 13.125,
+        "chapter": 5
+    },
+    {
+        "text": "BrainFrame provides three media modes to balance video rendering and hardware performance. MJPEG Sync Mode perfectly aligns video frames with their real-time AI inference results. For massive deployments, JPEG Static Mode maximizes inference processing power by turning off heavy UI decoding and rendering when it isn't needed. Finally, HLS Async Mode delivers a fluid live stream by decoupling the video and inference pipelines to save computational costs. We will keep the default setting for this demo and turn on 'Show Detections in Thumbnail View' so we can see live analytics across the board. [PAUSE 3.0]",
+        "media": "assets/settings_streams.mp4",
+        "duration": 35.45,
+        "chapter": 6
+    },
+    {
+        "text": "This entire demo is running locally on an Ubuntu machine equipped with a thirteenth-generation Intel Core i7 processor, thirty-two gigabytes of RAM, and an NVIDIA RTX A1000 GPU. This configuration easily handles real-time object detection and tracking across eight parallel ten-eighty-p streams. However, BrainFrame is highly efficient. You can run safety and security applications on a less powerful Intel or AMD processor with just six gigabytes of RAM and no dedicated graphics card. Your machine's available CPU and memory simply dictate how many concurrent models and streams you can support at once.",
+        "media": "assets/server_hardware.mp4",
+        "media_start": 0.0,
+        "media_end": 19.0,
+        "duration": 39.075,
+        "chapter": 7
+    },
+    {
+        "text": "Now let's deploy some AI models using the VisionCapsules AI Marketplace. VisionCapsules are lightweight, modular packages that allow developers to easily deploy vision models to BrainFrame-powered machines at scale. Hovering over a capsule shows its details, such as the specific objects it can detect. With a single click, you can download prebuilt models directly to your system. Once downloaded, clicking the right arrow loads them into the BrainFrame OS instantly. You can easily toggle loaded capsules on or off without removing them from memory, or open the settings gear to fine-tune algorithm parameters. For this traffic demo, we will load four capsules: the Person Vehicle Bike Detector, the Vehicle IOU Tracker, the Object Speed Calculator, and the Vehicle Color Classifier.",
+        "media": "assets/marketplace.mp4",
+        "duration": 42.0,
+        "chapter": 8
+    },
+    {
+        "text": "Back in the Web Client, you can see live detection and tracking overlays on our video stream. BrainFrame lets you manage these capsules globally or customize them per stream. Right now, our detector, tracker, color classifier, and speed calculator are active. Notice the vehicle at the front: the color in its bounding box disappears when I toggle the color classifier. Similarly, the trajectory behind the bus vanishes when I toggle the Vehicle IOU tracker.",
+        "media": "assets/traffic.mp4",
+        "duration": 22.55,
+        "chapter": 9
+    },
+    {
+        "text": "You can also enable and disable models directly from the BrainFrame Web Client. Clicking the Capsule button on the bottom left will open the capsule global configuration. To see the capsule configuration for a specific video stream, click the video, then click the configuration button at the bottom right. If you enable or disable any model, or tune any parameters, make sure to click Apply and then OK for the changes to take effect. [PAUSE 2.0]",
+        "media": "assets/capsule_config.mp4",
+        "duration": 23.475,
+        "chapter": 10
+    },
+    {
+        "text": "If we disable the object speed calculator, and vehicle color classifier, or enable any of the capsules, the overlays update instantly. When running multiple models simultaneously, the overlay can become crowded, but you can easily use the BrainFrame Client Settings menu to check or uncheck exactly what data you want displayed on screen. [PAUSE 3.0]",
+        "media": "assets/traffic_speed.mp4",
+        "duration": 23.375,
+        "chapter": 11
+    },
+    {
+        "text": "To keep the screen clean, let's hide the extra text attributes in the settings menu, so you can clearly see a virtual line drawn across the bus lane and a region zone covering the left lane. BrainFrame makes it incredibly simple to add these spatial boundaries to any video stream. They allow you to track exactly how many objects cross a line, catch vehicles moving in the wrong direction, monitor traffic speeds, or measure how long an object stays inside a specific area.",
+        "media": "assets/line.mp4",
+        "media_start": 3.0,
+        "duration": 22.375,
+        "chapter": 12
+    },
+    {
+        "text": "Setting these up takes only a few seconds. Clicking 'Task Config' opens the configuration window where you manage your lines and regions. Simply choose '+ Region' or '+ Line', name your zone, and use your mouse to draw a custom polygon directly over the video feed\u2014just like this center lane. Hit 'Confirm', and your new zone is instantly active.",
+        "media": "assets/task_config_zone.mp4",
+        "duration": 20.025,
+        "chapter": 13
+    },
+    {
+        "text": "Now, let's create a smart trigger by clicking '+ Alarm'. Select the zone you want to monitor, then set up your rules based on object types, quantities, or specific attributes. BrainFrame supports both count-based and rate-based triggers, meaning you can sound an alarm based on how many objects are present or how quickly they are entering and exiting. You can also define custom time windows and durations to ensure your alerts are highly accurate and reliable.",
+        "media": "assets/task_config_alarm.mp4",
+        "duration": 21.8,
+        "chapter": 14
+    },
+    {
+        "text": "[PAUSE 2.2] You just heard the preconfigured alert voice, 'bike'. [PAUSE 0.3] Once your alarms are configured, BrainFrame can connect those triggers directly to physical actions, transforming standard cameras into an active, AI-powered security patrol. It integrates seamlessly with compatible speakers, strobe lights and sirens, or automated PTZ camera movements for immediate crime deterrence. [PAUSE 3.0] In this demo, you can hear the system automatically broadcast a 'Wrong way' voice alert when a bicycle travels in the wrong direction. This is handled by the Alert Reaction App, making it simple to automate safety responses. [PAUSE 1.0]",
+        "media": "assets/bike_wrong_way.mp4",
+        "mix_audio": true,
+        "media_volume": 2,
+        "duration": 43.875,
+        "chapter": 15
+    },
+    {
+        "text": "For developers building custom software, all of this live data is easily accessible through the BrainFrame REST API. To get started, go to the documentation webpage, click REST API, [PAUSE 1] then click inference, and navigate to 'Responses' under 'Get zone statuses' to check out the data structure under the property name. You can ingest real-time zone statuses directly into your own applications. Furthermore, all analytical results are automatically stored in an underlying SQL database. This allows you to run your own SQL queries or hook up custom dashboard applications to unlock deep, data-driven business intelligence. [PAUSE 1.5]",
+        "media": "assets/rest_api_inference.mp4",
+        "duration": 37.375,
+        "chapter": 16
+    },
+    {
+        "text": "To make sure your deployment always utilizes the latest features and optimizations, click the About button to view your current running version. [PAUSE 3] You can verify release information directly within the documentation. Clicking the Downloads link on the left-hand navigation menu of the documentation page lets you check the latest release versions as well as past releases available on our website. [PAUSE 1]",
+        "media": "assets/downloads.mp4",
+        "duration": 29.1,
+        "chapter": 17
+    },
+    {
+        "text": "[PAUSE] ARE YOU READY to build your own intelligent vision applications? To install BrainFrame, head over to aotu AI and click the 'Download BrainFrame' button under our No-Code Low-Code AI Video Applications section. The site will guide you to the 'Getting Started' documentation to complete your installation. If you are an existing developer running an older deployment, you can upgrade your system instantly by running the update command directly from your terminal. Download BrainFrame today and start transforming your video streams into real-world intelligence. [PAUSE 3.0]",
+        "media": "assets/getting_started.mp4",
+        "media_end": 34.0,
+        "duration": 32.4,
+        "chapter": 18
+    }
+]
