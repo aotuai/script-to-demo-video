@@ -76,21 +76,30 @@ def validate_media_paths(script_data, script_dir):
             all_found = False
     return all_found
 
-def create_srt_file(text, duration, srt_path):
-    """Generates an SRT file with clean, wrapped text lines based on slide duration."""
+def create_ass_file(text, duration, ass_path, font_size=12, color_choice="lightgray"):
+    """Generates an Advanced SubStation (.ass) file with strict, clean styling."""
     hours = int(duration // 3600)
     minutes = int((duration % 3600) // 60)
     seconds = int(duration % 60)
-    milliseconds = int((duration % 1) * 1000)
-    end_time = f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
+    centiseconds = int((duration % 1) * 100)
+    end_time = f"{hours}:{minutes:02d}:{seconds:02d}.{centiseconds:02d}"
     
-    # Word wrap text cleanly around 55 characters to avoid screen overflow
+    # Map simple color names to ASS format (&HAABBGGRR)
+    colors = {
+        "black": "&H00000000",
+        "white": "&H00FFFFFF",
+        "darkgray": "&H00333333",
+        "lightgray": "&H00CCCCCC"
+    }
+    primary_color = colors.get(color_choice.lower(), "&H00CCCCCC") # Default to lightgray
+    
+    # Increased wrap length since the font defaults to a smaller size
     words = text.split()
     lines = []
     current_line = []
     current_length = 0
     for word in words:
-        if current_length + len(word) + 1 > 55:
+        if current_length + len(word) + 1 > 85:
             lines.append(" ".join(current_line))
             current_line = [word]
             current_length = len(word)
@@ -99,12 +108,24 @@ def create_srt_file(text, duration, srt_path):
             current_length += len(word) + 1
     if current_line:
         lines.append(" ".join(current_line))
-    wrapped_text = "\n".join(lines)
+        
+    wrapped_text = "\\N".join(lines)
 
-    with open(srt_path, 'w', encoding='utf-8') as f:
-        f.write("1\n")
-        f.write(f"00:00:00,000 --> {end_time}\n")
-        f.write(f"{wrapped_text}\n\n")
+    ass_content = f"""[Script Info]
+ScriptType=v4.00+
+PlayResX=1920
+PlayResY=1080
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,{font_size},{primary_color},&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,2,10,10,30,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,{end_time},Default,,0,0,0,,{wrapped_text}
+"""
+    with open(ass_path, 'w', encoding='utf-8') as f:
+        f.write(ass_content)
 
 async def generate_audio(text, engine, voice, volume, output_path, pipeline=None):
     """Generates audio using either edge-tts or kokoro."""
@@ -137,11 +158,12 @@ def get_audio_duration_seconds(audio_path):
         logging.error(f"❌ Could not read audio file duration: {e}")
         return None
 
-def create_video_from_image(image_path, duration, output_path, resolution="1920x1080", captions_srt=None, verbose=False):
+def create_video_from_image(image_path, duration, output_path, resolution="1920x1080", captions_file=None, verbose=False):
     width, height = resolution.split('x')
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
-    if captions_srt:
-        video_filter += f",subtitles={captions_srt}"
+    
+    if captions_file:
+        video_filter += f",subtitles={captions_file}"
         
     command = [
         'ffmpeg', '-nostdin', '-loop', '1', '-i', image_path, '-c:v', 'libx264', '-tune', 'stillimage',
@@ -154,11 +176,12 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
         if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
-def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_srt=None, verbose=False):
+def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_file=None, verbose=False):
     width, height = resolution.split('x')
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
-    if captions_srt:
-        video_filter += f",subtitles={captions_srt}"
+    
+    if captions_file:
+        video_filter += f",subtitles={captions_file}"
 
     command = [
         'ffmpeg', '-nostdin', '-stream_loop', '-1', '-i', input_video_path, 
@@ -211,8 +234,9 @@ async def main():
     parser.add_argument("script_file", nargs='?', default=None)
     parser.add_argument("output_video", nargs='?', default=None)
     parser.add_argument("--engine", choices=['edge', 'kokoro'], default='kokoro')
-    # Captions are now OFF by default. Using this flag turns them ON.
-    parser.add_argument("--captions", action="store_true", help="Enable basic slide-level on-screen captions.")
+    parser.add_argument("--captions", action="store_true", help="Enable beautiful, styled slide-level captions.")
+    parser.add_argument("--font-size", type=int, default=12, help="Font size for the on-screen captions (default: 12).")
+    parser.add_argument("--caption-color", choices=['black', 'white', 'darkgray', 'lightgray'], default='lightgray', help="Color of the caption text (default: darkgray).")
     parser.add_argument("--lang", default="en-US")
     parser.add_argument("--gender", choices=['male', 'female'], default='male')
     parser.add_argument("--volume", default="+0%")
@@ -254,7 +278,7 @@ async def main():
         pipeline = KPipeline(lang_code='a')
         selected_voice = args.voice if args.voice else 'am_fenrir'
     
-    logging.info(f"🚀 ENGINE: {args.engine.upper()} | VOICE: {selected_voice} | CAPTIONS: {'ON' if args.captions else 'OFF'}")
+    logging.info(f"🚀 ENGINE: {args.engine.upper()} | VOICE: {selected_voice} | CAPTIONS: {'ON (Size ' + str(args.font_size) + ', ' + args.caption_color + ')' if args.captions else 'OFF'}")
 
     try:
         with open(args.script_file, 'r') as f:
@@ -276,7 +300,8 @@ async def main():
     narrated_clips = []
     full_script_text = []
     video_extensions = ('.mp4', '.mov', '.avi', '.mkv', '.webm')
-    srt_filename = "temp_caption.srt"
+    
+    ass_filename = "temp_caption.ass"
     
     try:
         for i, section in enumerate(script_data):
@@ -309,22 +334,20 @@ async def main():
             print(f"   🔊 Audio: {duration:.2f} seconds")
             section['duration'] = duration
             
-            # Setup captions only if the flag is passed
             if args.captions:
-                create_srt_file(text, duration, srt_filename)
-                captions_arg = srt_filename
+                create_ass_file(text, duration, ass_filename, font_size=args.font_size, color_choice=args.caption_color)
+                captions_arg = ass_filename
             else:
                 captions_arg = None
 
             is_video = media_abs_path.lower().endswith(video_extensions)
             if is_video:
-                success = create_video_from_video(media_abs_path, duration, silent_video_path, captions_srt=captions_arg, verbose=args.verbose)
+                success = create_video_from_video(media_abs_path, duration, silent_video_path, captions_file=captions_arg, verbose=args.verbose)
             else:
-                success = create_video_from_image(media_abs_path, duration, silent_video_path, captions_srt=captions_arg, verbose=args.verbose)
+                success = create_video_from_image(media_abs_path, duration, silent_video_path, captions_file=captions_arg, verbose=args.verbose)
                 
-            # Immediately clear temporary subtitle token file
-            if os.path.exists(srt_filename):
-                os.remove(srt_filename)
+            if os.path.exists(ass_filename):
+                os.remove(ass_filename)
 
             if not success or not combine_video_and_audio(silent_video_path, audio_path, narrated_clip_path, verbose=args.verbose):
                 raise RuntimeError("FFmpeg compositing processing error.")
@@ -342,7 +365,6 @@ async def main():
                 with open(args.script_file, 'w') as f:
                     json.dump(script_data, f, indent=4)
                 
-                # Export the full readable text script
                 base_video_name = os.path.splitext(output_video_path)[0]
                 script_txt_path = f"{base_video_name}_script.txt"
                 with open(script_txt_path, 'w', encoding='utf-8') as f:
@@ -357,8 +379,8 @@ async def main():
 
     except Exception as e:
         logging.error(f"\n❌ Critical Pipeline Interrupt: {e}")
-        if os.path.exists(srt_filename):
-            os.remove(srt_filename)
+        if os.path.exists(ass_filename):
+            os.remove(ass_filename)
     finally:
         shutil.rmtree(temp_dir)
 
