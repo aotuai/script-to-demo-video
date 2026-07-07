@@ -39,7 +39,7 @@ Create a JSON file (e.g., demo.json) containing your script and media paths. The
 python script_to_demo_video.py demo.json my_demo.mp4
 
 # Alternative: Uses Kokoro (local/private)
-python script_to_demo_video.py demo.json my_demo.mp4 --engine kokoro --voice af_heart
+python script_to_demo_video.py demo.json my_demo.mp4 --engine kokoro --voice am_fenrir
 ```
 ## The JSON Payload
 The script expects a JSON array of objects. Each object represents one "slide" or "section" of your video.
@@ -81,7 +81,7 @@ You can customize the voice, volume, and output behavior using CLI flags.
 | `script_file` | Path to the input JSON file. | **Required** |
 | `output_video` | Path to save the final stitched video. (Defaults to script filename with .mp4) | Optional |
 | `--engine` | Choose the TTS engine: `edge` (cloud/fast) or `kokoro` (local/private). | `edge` |
-| `--voice` | Exact voice name to use (e.g., `en-US-AriaNeural` for edge, `af_heart` for kokoro). | None |
+| `--voice` | Exact voice name to use (e.g., `en-US-AriaNeural` for edge, `am_fenrir` for kokoro). | None |
 | `--gender` | Target gender if searching for a voice automatically (Edge only). | `male` |
 | `--lang` | Target locale if searching for a voice automatically (e.g., `en-GB`, `es-MX`) (Edge only). | `en-US` |
 | `--volume` | Volume adjustment for the TTS output. Use percentages (Edge only). | `+0%` |
@@ -97,7 +97,7 @@ Once you find a voice you like, use the `ShortName` with the `--voice` flag:
 `python script_to_demo_video.py demo.json --voice en-GB-RyanNeural`
 
 ### Using Kokoro (Local)
-Kokoro uses specific pre-trained voice files. By default, the script falls back to `af_heart` (a high-quality American female voice). Some other popular Kokoro voices include:
+Kokoro uses specific pre-trained voice files. By default, the script falls back to `am_fenrir` (a high-quality American female voice). Some other popular Kokoro voices include:
 * **Female:** `af_heart`, `af_alloy`, `af_bella`
 * **Male:** `am_fenrir`, `am_michael`, `am_puck`
 

@@ -221,12 +221,12 @@ async def main():
     parser.add_argument("output_video", nargs='?', default=None, help="Optional. Path for the final output video (defaults to script filename with .mp4).")
     
     # --- NEW: Engine Selection ---
-    parser.add_argument("--engine", choices=['edge', 'kokoro'], default='edge', help="Choose the TTS engine: 'edge' (cloud/fast) or 'kokoro' (local/private). Default: edge.")
+    parser.add_argument("--engine", choices=['edge', 'kokoro'], default='kokoro', help="Choose the TTS engine: 'edge' (cloud/fast) or 'kokoro' (local/private). Default: kokoro.")
     
     parser.add_argument("--lang", default="en-US", help="Language-locale code for the voice (e.g., 'en-GB', 'es-MX').\nUsed if --voice is not set (Edge only).")
     parser.add_argument("--gender", choices=['male', 'female'], default='male', help="Gender of the voice. Used if --voice is not set (Edge only).")
     parser.add_argument("--volume", default="+0%", help="Volume adjustment for the voice (e.g., '+10%%', '-5%%') (Edge only).")
-    parser.add_argument("--voice", default=None, help="Exact voice name to use (e.g., 'en-GB-RyanNeural' for edge, 'af_heart' for kokoro).\nOverrides --lang and --gender.")
+    parser.add_argument("--voice", default=None, help="Exact voice name to use (e.g., 'en-GB-RyanNeural' for edge, 'am_fenrir' for kokoro).\nOverrides --lang and --gender.")
     parser.add_argument("--verbose", action="store_true", help="Show detailed output from FFmpeg commands.")
     parser.add_argument("--list-voices", action="store_true", help="List all available voices from edge-tts and exit.")
     
@@ -269,7 +269,7 @@ async def main():
     else: # Kokoro
         logging.info("Initializing Kokoro local pipeline...")
         pipeline = KPipeline(lang_code='a')
-        selected_voice = args.voice if args.voice else 'af_heart' # Default to high-quality female Kokoro voice
+        selected_voice = args.voice if args.voice else 'am_fenrir' # Default to high-quality male Kokoro voice
     
     logging.info(f"✅ TTS Engine: {args.engine.upper()} | Voice selected: {selected_voice}")
 
