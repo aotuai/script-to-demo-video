@@ -7,6 +7,8 @@ import argparse
 import subprocess
 import asyncio
 import edge_tts
+import soundfile as sf
+from kokoro import KPipeline
 from pydub import AudioSegment
 
 # --- Configuration ---
@@ -17,7 +19,7 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 async def display_voices():
     """Lists all available voices from edge-tts in a readable format and exits."""
-    print("--- Available TTS Voices ---")
+    print("--- Available TTS Voices (Edge-TTS) ---")
     print("Use the 'ShortName' with the --voice flag for precise selection.")
     print("Or, use the 'Locale' and 'Gender' with the --lang and --gender flags.\n")
     try:
@@ -89,21 +91,37 @@ def validate_media_paths(script_data, script_dir):
         logging.error("Please correct the paths in your JSON file before proceeding.")
     return all_found
 
-async def generate_audio_from_text(text, voice, volume, output_path):
-    """Generates an MP3 audio file from text using edge-tts."""
-    try:
-        logging.info(f"Generating audio for: '{text[:50]}...' using voice '{voice}'")
-        communicate = edge_tts.Communicate(text, voice, volume=volume)
-        await communicate.save(output_path)
-        return True
-    except Exception as e:
-        logging.error(f"Failed to generate audio with edge-tts: {e}")
-        return False
+async def generate_audio(text, engine, voice, volume, output_path, pipeline=None):
+    """Generates audio using either edge-tts or kokoro."""
+    logging.info(f"Generating audio for: '{text[:50]}...' using engine '{engine}', voice '{voice}'")
+    
+    if engine == 'edge':
+        try:
+            communicate = edge_tts.Communicate(text, voice, volume=volume)
+            await communicate.save(output_path)
+            return True
+        except Exception as e:
+            logging.error(f"Failed to generate audio with edge-tts: {e}")
+            return False
+            
+    elif engine == 'kokoro':
+        try:
+            generator = pipeline(text, voice=voice, speed=1.0)
+            full_audio = []
+            for _, _, audio_chunk in generator:
+                full_audio.extend(audio_chunk)
+            # Save as 24kHz WAV file
+            sf.write(output_path, full_audio, 24000)
+            return True
+        except Exception as e:
+            logging.error(f"Failed to generate audio with Kokoro: {e}")
+            return False
 
 def get_audio_duration_seconds(audio_path):
-    """Measures the duration of an audio file in seconds."""
+    """Measures the duration of an audio file in seconds (supports mp3 and wav)."""
     try:
-        sound = AudioSegment.from_mp3(audio_path)
+        # Changed to from_file to handle both .mp3 and .wav dynamically
+        sound = AudioSegment.from_file(audio_path)
         duration = len(sound) / 1000.0
         logging.info(f"Audio duration: {duration:.2f} seconds.")
         return duration
@@ -202,23 +220,28 @@ async def main():
     parser.add_argument("script_file", nargs='?', default=None, help="Path to the JSON file containing the script and media paths.")
     parser.add_argument("output_video", nargs='?', default=None, help="Optional. Path for the final output video (defaults to script filename with .mp4).")
     
-    parser.add_argument("--lang", default="en-US", help="Language-locale code for the voice (e.g., 'en-GB', 'es-MX').\nUsed if --voice is not set.")
-    parser.add_argument("--gender", choices=['male', 'female'], default='male', help="Gender of the voice. Used if --voice is not set.")
-    parser.add_argument("--volume", default="+0%", help="Volume adjustment for the voice (e.g., '+10%%', '-5%%').")
-    parser.add_argument("--voice", default=None, help="Exact voice name to use (e.g., 'en-GB-RyanNeural').\nOverrides --lang and --gender.")
+    # --- NEW: Engine Selection ---
+    parser.add_argument("--engine", choices=['edge', 'kokoro'], default='edge', help="Choose the TTS engine: 'edge' (cloud/fast) or 'kokoro' (local/private). Default: edge.")
+    
+    parser.add_argument("--lang", default="en-US", help="Language-locale code for the voice (e.g., 'en-GB', 'es-MX').\nUsed if --voice is not set (Edge only).")
+    parser.add_argument("--gender", choices=['male', 'female'], default='male', help="Gender of the voice. Used if --voice is not set (Edge only).")
+    parser.add_argument("--volume", default="+0%", help="Volume adjustment for the voice (e.g., '+10%%', '-5%%') (Edge only).")
+    parser.add_argument("--voice", default=None, help="Exact voice name to use (e.g., 'en-GB-RyanNeural' for edge, 'af_heart' for kokoro).\nOverrides --lang and --gender.")
     parser.add_argument("--verbose", action="store_true", help="Show detailed output from FFmpeg commands.")
     parser.add_argument("--list-voices", action="store_true", help="List all available voices from edge-tts and exit.")
     
     args = parser.parse_args()
 
     if args.list_voices:
-        await display_voices()
+        if args.engine == 'edge':
+            await display_voices()
+        else:
+            logging.warning("Voice listing is only available for the 'edge' engine. Run without --engine kokoro.")
         sys.exit(0)
     
     if not args.script_file:
         parser.error("The 'script_file' argument is required when not using --list-voices.")
 
-    # --- NEW: Automatically determine output video name if missing ---
     if not args.output_video:
         base_name = os.path.splitext(args.script_file)[0]
         args.output_video = f"{base_name}.mp4"
@@ -233,15 +256,22 @@ async def main():
     if not check_ffmpeg_installed():
         sys.exit(1)
 
-    selected_voice = args.voice
-    if not selected_voice:
-        logging.info(f"Searching for a '{args.gender}' voice in language '{args.lang}'...")
-        selected_voice = await find_voice(args.gender, args.lang)
+    # --- Initialize Engine & Voice ---
+    pipeline = None
+    if args.engine == 'edge':
+        selected_voice = args.voice
         if not selected_voice:
-            logging.error(f"Could not find an edge-tts voice for gender='{args.gender}' and lang='{args.lang}'.")
-            sys.exit(1)
+            logging.info(f"Searching for a '{args.gender}' voice in language '{args.lang}'...")
+            selected_voice = await find_voice(args.gender, args.lang)
+            if not selected_voice:
+                logging.error(f"Could not find an edge-tts voice for gender='{args.gender}' and lang='{args.lang}'.")
+                sys.exit(1)
+    else: # Kokoro
+        logging.info("Initializing Kokoro local pipeline...")
+        pipeline = KPipeline(lang_code='a')
+        selected_voice = args.voice if args.voice else 'af_heart' # Default to high-quality female Kokoro voice
     
-    logging.info(f"✅ Voice selected: {selected_voice}")
+    logging.info(f"✅ TTS Engine: {args.engine.upper()} | Voice selected: {selected_voice}")
 
     try:
         with open(args.script_file, 'r') as f:
@@ -277,11 +307,16 @@ async def main():
                 continue
             
             media_abs_path = os.path.join(script_dir, media_path)
-            audio_path = os.path.join(temp_dir, f"audio_{i}.mp3")
+            
+            # Determine correct audio extension based on the engine
+            audio_ext = ".mp3" if args.engine == 'edge' else ".wav"
+            audio_path = os.path.join(temp_dir, f"audio_{i}{audio_ext}")
+            
             silent_video_path = os.path.join(temp_dir, f"silent_video_{i}.mp4")
             narrated_clip_path = os.path.join(temp_dir, f"narrated_clip_{i}.mp4")
 
-            if not await generate_audio_from_text(text, selected_voice, args.volume, audio_path):
+            # Generate audio using the unified wrapper
+            if not await generate_audio(text, args.engine, selected_voice, args.volume, audio_path, pipeline):
                 raise RuntimeError("Failed during audio generation.")
             
             duration = get_audio_duration_seconds(audio_path)
