@@ -76,6 +76,36 @@ def validate_media_paths(script_data, script_dir):
             all_found = False
     return all_found
 
+def create_srt_file(text, duration, srt_path):
+    """Generates an SRT file with clean, wrapped text lines based on slide duration."""
+    hours = int(duration // 3600)
+    minutes = int((duration % 3600) // 60)
+    seconds = int(duration % 60)
+    milliseconds = int((duration % 1) * 1000)
+    end_time = f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
+    
+    # Word wrap text cleanly around 55 characters to avoid screen overflow
+    words = text.split()
+    lines = []
+    current_line = []
+    current_length = 0
+    for word in words:
+        if current_length + len(word) + 1 > 55:
+            lines.append(" ".join(current_line))
+            current_line = [word]
+            current_length = len(word)
+        else:
+            current_line.append(word)
+            current_length += len(word) + 1
+    if current_line:
+        lines.append(" ".join(current_line))
+    wrapped_text = "\n".join(lines)
+
+    with open(srt_path, 'w', encoding='utf-8') as f:
+        f.write("1\n")
+        f.write(f"00:00:00,000 --> {end_time}\n")
+        f.write(f"{wrapped_text}\n\n")
+
 async def generate_audio(text, engine, voice, volume, output_path, pipeline=None):
     """Generates audio using either edge-tts or kokoro."""
     if engine == 'edge':
@@ -107,9 +137,12 @@ def get_audio_duration_seconds(audio_path):
         logging.error(f"❌ Could not read audio file duration: {e}")
         return None
 
-def create_video_from_image(image_path, duration, output_path, resolution="1920x1080", verbose=False):
+def create_video_from_image(image_path, duration, output_path, resolution="1920x1080", captions_srt=None, verbose=False):
     width, height = resolution.split('x')
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
+    if captions_srt:
+        video_filter += f",subtitles={captions_srt}"
+        
     command = [
         'ffmpeg', '-nostdin', '-loop', '1', '-i', image_path, '-c:v', 'libx264', '-tune', 'stillimage',
         '-vf', video_filter, '-pix_fmt', 'yuv420p', '-t', str(duration), '-y', output_path
@@ -121,9 +154,12 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
         if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
-def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", verbose=False):
+def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_srt=None, verbose=False):
     width, height = resolution.split('x')
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
+    if captions_srt:
+        video_filter += f",subtitles={captions_srt}"
+
     command = [
         'ffmpeg', '-nostdin', '-stream_loop', '-1', '-i', input_video_path, 
         '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 
@@ -175,6 +211,8 @@ async def main():
     parser.add_argument("script_file", nargs='?', default=None)
     parser.add_argument("output_video", nargs='?', default=None)
     parser.add_argument("--engine", choices=['edge', 'kokoro'], default='kokoro')
+    # Captions are now OFF by default. Using this flag turns them ON.
+    parser.add_argument("--captions", action="store_true", help="Enable basic slide-level on-screen captions.")
     parser.add_argument("--lang", default="en-US")
     parser.add_argument("--gender", choices=['male', 'female'], default='male')
     parser.add_argument("--volume", default="+0%")
@@ -216,7 +254,7 @@ async def main():
         pipeline = KPipeline(lang_code='a')
         selected_voice = args.voice if args.voice else 'am_fenrir'
     
-    logging.info(f"🚀 ENGINE: {args.engine.upper()} | VOICE: {selected_voice}")
+    logging.info(f"🚀 ENGINE: {args.engine.upper()} | VOICE: {selected_voice} | CAPTIONS: {'ON' if args.captions else 'OFF'}")
 
     try:
         with open(args.script_file, 'r') as f:
@@ -236,7 +274,9 @@ async def main():
     logging.info(f"📂 Slide Exports Target: {slides_export_dir}\n")
     
     narrated_clips = []
+    full_script_text = []
     video_extensions = ('.mp4', '.mov', '.avi', '.mkv', '.webm')
+    srt_filename = "temp_caption.srt"
     
     try:
         for i, section in enumerate(script_data):
@@ -247,7 +287,9 @@ async def main():
             if not text or not media_path:
                 continue
             
-            print(f"🔷 [Section {i+1}/{len(script_data)}] ----------------------------------------")
+            full_script_text.append(text)
+            
+            print(f"\n🔷 [Section {i+1}/{len(script_data)}]")
             print(f"   📖 Text:  \"{text[:65]}...\"")
             print(f"   🖼️  Media: {media_path}")
             
@@ -267,12 +309,23 @@ async def main():
             print(f"   🔊 Audio: {duration:.2f} seconds")
             section['duration'] = duration
             
+            # Setup captions only if the flag is passed
+            if args.captions:
+                create_srt_file(text, duration, srt_filename)
+                captions_arg = srt_filename
+            else:
+                captions_arg = None
+
             is_video = media_abs_path.lower().endswith(video_extensions)
             if is_video:
-                success = create_video_from_video(media_abs_path, duration, silent_video_path, verbose=args.verbose)
+                success = create_video_from_video(media_abs_path, duration, silent_video_path, captions_srt=captions_arg, verbose=args.verbose)
             else:
-                success = create_video_from_image(media_abs_path, duration, silent_video_path, verbose=args.verbose)
+                success = create_video_from_image(media_abs_path, duration, silent_video_path, captions_srt=captions_arg, verbose=args.verbose)
                 
+            # Immediately clear temporary subtitle token file
+            if os.path.exists(srt_filename):
+                os.remove(srt_filename)
+
             if not success or not combine_video_and_audio(silent_video_path, audio_path, narrated_clip_path, verbose=args.verbose):
                 raise RuntimeError("FFmpeg compositing processing error.")
 
@@ -281,22 +334,31 @@ async def main():
             narrated_clips.append(narrated_clip_path)
 
             slide_elapsed = time.time() - slide_start
-            print(f"   ⚡ Done:   {slide_filename} (Processed in {slide_elapsed:.2f}s)\n")
+            print(f"   ⚡ Done:   {slide_filename} (Processed in {slide_elapsed:.2f}s)")
 
         if narrated_clips:
-            print("🎬 Sewing all generated slides into final showcase...")
+            print("\n🎬 Sewing all generated slides into final showcase...")
             if concatenate_videos(narrated_clips, output_video_path, temp_dir, verbose=args.verbose):
                 with open(args.script_file, 'w') as f:
                     json.dump(script_data, f, indent=4)
                 
+                # Export the full readable text script
+                base_video_name = os.path.splitext(output_video_path)[0]
+                script_txt_path = f"{base_video_name}_script.txt"
+                with open(script_txt_path, 'w', encoding='utf-8') as f:
+                    f.write("\n\n".join(full_script_text))
+                
                 total_elapsed = time.time() - total_start_time
                 print("=========================================================")
                 print(f"✅ SUCCESS: Final video exported to -> {output_video_path}")
+                print(f"📄 Script text exported to -> {script_txt_path}")
                 print(f"⏱️  TOTAL PROCESSING TIME: {total_elapsed:.2f} seconds")
                 print("=========================================================")
 
     except Exception as e:
         logging.error(f"\n❌ Critical Pipeline Interrupt: {e}")
+        if os.path.exists(srt_filename):
+            os.remove(srt_filename)
     finally:
         shutil.rmtree(temp_dir)
 
