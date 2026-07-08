@@ -1,0 +1,15 @@
+[
+    {
+        "text": "Welcome to the IT Helpdesk tutorial on using BrainFrame AI.",
+        "media": "assets/homepage.png",
+        "duration": 4.575,
+        "chapter": 1
+    },
+    {
+        "text": "[PAUSE] ARE YOU READY to build your own intelligent vision applications? To install BrainFrame, head over to aotu AI and click the 'Download BrainFrame' button under our No-Code Low-Code AI Video Applications section. The site will guide you to the 'Getting Started' documentation to complete your installation. If you are an existing developer running an older deployment, you can upgrade your system instantly by running the update command directly from your terminal. Download BrainFrame today and start transforming your video streams into real-world intelligence. [PAUSE 3.0]",
+        "media": "../brainframe_webclient/assets/getting_started.mp4",
+        "media_end": 34.0,
+        "duration": 32.4,
+        "chapter": 2
+    }
+]
