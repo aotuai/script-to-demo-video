@@ -7,18 +7,18 @@ Built for IT professionals, sysadmins, and support teams who want to treat instr
 You can now choose between Microsoft's high-speed cloud TTS (`edge-tts`) or a 100% local, private, and open-source neural TTS model (`kokoro`).
 
 ## Why use this?
-- Video-as-Code: Keep your internal documentation and helpdesk videos in version control.
-- Perfectly Timed: Automatically calculates the exact duration of the generated Text-to-Speech (TTS) audio and perfectly syncs, loops, or pads your visual media to match.
-- Iterative Screen Recording: Automatically exports individual .mp4 files for every slide. This allows you to listen to the generated audio for a specific step and record a screen capture that perfectly matches that exact timing.
-- AI-Friendly: The input format is a strict JSON array, making it incredibly easy for LLMs and AI agents to generate instructional videos automatically.
-- **Dual TTS Engines:** Use `edge-tts` for quick, zero-setup cloud generation, or switch to `kokoro` for complete offline privacy and commercial-friendly open-source narration.
+- **Video-as-Code**: Keep your internal documentation and helpdesk videos in version control.
+- **Perfectly Timed**: Automatically calculates the exact duration of the generated Text-to-Speech (TTS) audio and perfectly syncs, loops, or pads your visual media to match.
+- **Iterative Screen Recording**: Automatically exports individual `.mp4` files for every slide. This allows you to listen to the generated audio for a specific step and record a screen capture that perfectly matches that exact timing.
+- **AI-Friendly**: The input format is a strict JSON array, making it incredibly easy for LLMs and AI agents to generate instructional videos automatically.
+- **Dual TTS Engines:** Use `edge-tts` for quick, zero-setup cloud generation, or default to `kokoro` for complete offline privacy and commercial-friendly open-source narration.
 
 ## Prerequisites
 1. Python 3.8+
 1. FFmpeg: Must be installed and accessible in your system's PATH.
-   - Ubuntu/Debian: sudo apt install ffmpeg
-   - macOS: brew install ffmpeg
-   - Windows: winget install ffmpeg
+   - Ubuntu/Debian: `sudo apt install ffmpeg`
+   - macOS: `brew install ffmpeg`
+   - Windows: `winget install ffmpeg`
 
 ## Installation
 Clone the repository and install the required Python packages:
@@ -51,23 +51,26 @@ flatpak run io.github.seadve.Kooha
 The script expects a JSON array of objects. Each object represents one "slide" or "section" of your video.
 
 ```JSON
-JSON
 [
     {
-        "text": "Welcome to the IT Helpdesk tutorial on using BrainFrame AI.",
+        "text": "Welcome to the IT Helpdesk tutorial on using BrainFrame AI. [PAUSE 1.5] Let's begin.",
         "media": "assets/intro_slide.png"
     },
     {
-        "text": "First, open the BrainFrame Webclient by typing the server's IP address into your browser's address bar. Press Enter.",
-        "media": "assets/login_step.mp4"
+        "text": "[PAUSE 2.0] First, open the BrainFrame Webclient by typing the server's IP address into your browser's address bar. Press Enter. [PAUSE]",
+        "media": "assets/login_step.mp4",
+        "mix_audio": true,
+        "media_volume": 0.25
     }
 ]
 ```
-- text: The exact words the TTS engine will speak.
-- media: The path to your visual asset (relative to the JSON file). Supports images (.png, .jpg) and video clips (.mp4, .mov, .avi, .mkv).
-- (Legacy support: You can also use the key "image" instead of "media").
+- `text`: The exact words the TTS engine will speak. (Note: You can insert inline tags like `[PAUSE 2.0]` directly into the text to force the TTS engine to pause mid-sentence or add trailing silence at the end).
+- `media`: The path to your visual asset (relative to the JSON file). Supports images (`.png`, `.jpg`) and video clips (`.mp4`, `.mov`, `.avi`, `.mkv`).
+- `mix_audio`: (Optional) Boolean (true/false). Set to true to keep the original audio from your video media file and mix it underneath the TTS narration.
+- `media_volume`: (Optional) Float. When mix_audio is enabled, this sets the volume level of the background media (e.g., 0.25 for 25% volume).
+- (Legacy support: You can also use the key `image` instead of "media").
 
-Note on Durations: You do not need to provide timing! The tool will calculate the required duration based on the generated audio and automatically update your JSON file to append a "duration" key for your reference.
+Note on Durations: You do not need to provide timing! The tool will calculate the required duration based on the generated audio and automatically update your JSON file to append a `duration` key for your reference.
 
 ## The "Perfect Timing" Workflow
 This tool is designed to make recording complex screencasts easy by breaking them down into manageable, pre-timed chunks.

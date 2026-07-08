@@ -8,6 +8,7 @@ import subprocess
 import asyncio
 import time
 import warnings
+import re
 
 # --- Dependency Check ---
 try:
@@ -362,7 +363,9 @@ async def main():
             if not text or not media_path:
                 continue
             
-            full_script_text.append(text)
+            # Remove any PAUSE tags for the final clean text export
+            clean_text_for_export = re.sub(r'\[PAUSE.*?\]', '', text).replace('  ', ' ').strip()
+            full_script_text.append(clean_text_for_export)
             
             mix_audio_flag = section.get('mix_audio', section.get('media_audio_enabled', False))
             current_media_volume = section.get('media_volume', args.media_volume)
@@ -373,15 +376,48 @@ async def main():
             if mix_audio_flag:
                 print(f"   🎵 Mixing: Original Media Audio Enabled (Volume: {current_media_volume})")
             
+            pause_tags = re.findall(r'\[PAUSE.*?\]', text)
+            if pause_tags:
+                print(f"   ⏱️  Padding: {len(pause_tags)} [PAUSE] tag(s) detected")
+            
             media_abs_path = os.path.join(script_dir, media_path)
             audio_ext = ".mp3" if args.engine == 'edge' else ".wav"
             audio_path = os.path.join(temp_dir, f"audio_{i}{audio_ext}")
             processed_video_path = os.path.join(temp_dir, f"processed_video_{i}.mp4")
             narrated_clip_path = os.path.join(temp_dir, f"narrated_clip_{i}.mp4")
 
-            if not await generate_audio(text, args.engine, selected_voice, args.volume, audio_path, pipeline):
-                raise RuntimeError("Audio synthesis failed.")
+            # --- Dynamic Text Chunking & Pause Injection ---
+            # Splits the text while keeping the PAUSE tags as separate elements in the list
+            parts = re.split(r'(\[PAUSE.*?\])', text)
+            full_audio = AudioSegment.empty()
             
+            chunk_idx = 0
+            for part in parts:
+                part = part.strip()
+                if not part:
+                    continue
+                
+                if part.startswith('[PAUSE'):
+                    # Extract numeric duration, default to 1.0 if not specified
+                    match = re.search(r'\[PAUSE\s*([\d\.]+)\]', part)
+                    if match:
+                        pause_duration = float(match.group(1))
+                    else:
+                        pause_duration = 1.0
+                    full_audio += AudioSegment.silent(duration=int(pause_duration * 1000))
+                else:
+                    chunk_path = os.path.join(temp_dir, f"chunk_{i}_{chunk_idx}{audio_ext}")
+                    if not await generate_audio(part, args.engine, selected_voice, args.volume, chunk_path, pipeline):
+                        raise RuntimeError(f"Audio synthesis failed on chunk: {part}")
+                    
+                    chunk_seg = AudioSegment.from_file(chunk_path)
+                    full_audio += chunk_seg
+                    chunk_idx += 1
+                
+            # Export the perfectly stitched audio track
+            export_format = "mp3" if args.engine == 'edge' else "wav"
+            full_audio.export(audio_path, format=export_format)
+
             duration = get_audio_duration_seconds(audio_path)
             if duration is None:
                 raise RuntimeError("Audio length tracking failed.")
@@ -390,7 +426,9 @@ async def main():
             section['duration'] = duration
             
             if args.captions:
-                create_ass_file(text, duration, ass_filename, font_size=args.font_size, color_choice=args.caption_color)
+                # Strip all [PAUSE] tags before generating subtitles so they don't show on screen
+                display_text = re.sub(r'\[PAUSE.*?\]', '', text).replace('  ', ' ').strip()
+                create_ass_file(display_text, duration, ass_filename, font_size=args.font_size, color_choice=args.caption_color)
                 captions_arg = ass_filename
             else:
                 captions_arg = None
