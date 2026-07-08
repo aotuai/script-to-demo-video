@@ -8,10 +8,20 @@ import subprocess
 import asyncio
 import time
 import warnings
-import edge_tts
-import soundfile as sf
-from kokoro import KPipeline
-from pydub import AudioSegment
+
+# --- Dependency Check ---
+try:
+    import edge_tts
+    import soundfile as sf
+    from kokoro import KPipeline
+    from pydub import AudioSegment
+except ImportError as e:
+    # Extract the name of the missing module from the error message
+    missing_module = str(e).split("'")[1] if "'" in str(e) else str(e)
+    print(f"\n❌ Missing required Python library: {missing_module}")
+    print("Please make sure your virtual environment is activated, then run:")
+    print("    pip install -r requirements.txt\n")
+    sys.exit(1)
 
 # Suppress messy PyTorch warnings and third-party network logs
 warnings.filterwarnings('ignore')
