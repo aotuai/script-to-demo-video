@@ -210,13 +210,13 @@ def create_video_from_video(input_video_path, duration, output_path, resolution=
         if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
-def combine_video_and_audio(video_path, audio_path, output_path, mix_audio=False, verbose=False):
+def combine_video_and_audio(video_path, audio_path, output_path, mix_audio=False, media_volume=1.0, verbose=False):
     """Merges video and audio, enforcing strict 44.1kHz Stereo so concat doesn't break."""
     if mix_audio:
         command = [
             'ffmpeg', '-nostdin', '-i', video_path, '-i', audio_path, 
             '-filter_complex', 
-            '[0:a]volume=0.3[bg];[1:a]volume=2.0[tts];[bg][tts]amix=inputs=2:duration=longest[aout]', 
+            f'[0:a]volume={media_volume}[bg];[1:a]volume=2.0[tts];[bg][tts]amix=inputs=2:duration=longest[aout]', 
             '-map', '0:v:0', '-map', '[aout]', 
             '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '44100', '-ac', '2', '-shortest', '-y', output_path
         ]
@@ -278,6 +278,7 @@ async def main():
     parser.add_argument("--captions", action="store_true", help="Enable beautiful, styled slide-level captions.")
     parser.add_argument("--font-size", type=int, default=12, help="Font size for the on-screen captions (default: 12).")
     parser.add_argument("--caption-color", choices=['black', 'white', 'darkgray', 'lightgray'], default='lightgray', help="Color of the caption text.")
+    parser.add_argument("--media-volume", type=float, default=1.0, help="Global volume level for background media when mixed (default: 1.0).")
     parser.add_argument("--lang", default="en-US")
     parser.add_argument("--gender", choices=['male', 'female'], default='male')
     parser.add_argument("--volume", default="+0%")
@@ -356,12 +357,13 @@ async def main():
             full_script_text.append(text)
             
             mix_audio_flag = section.get('mix_audio', section.get('media_audio_enabled', False))
+            current_media_volume = section.get('media_volume', args.media_volume)
             
             print(f"\n🔷 [Section {i+1}/{len(script_data)}]")
             print(f"   📖 Text:  \"{text[:65]}...\"")
             print(f"   🖼️  Media: {media_path}")
             if mix_audio_flag:
-                print(f"   🎵 Mixing: Original Media Audio Enabled")
+                print(f"   🎵 Mixing: Original Media Audio Enabled (Volume: {current_media_volume})")
             
             media_abs_path = os.path.join(script_dir, media_path)
             audio_ext = ".mp3" if args.engine == 'edge' else ".wav"
@@ -398,7 +400,7 @@ async def main():
             if os.path.exists(ass_filename):
                 os.remove(ass_filename)
 
-            if not success or not combine_video_and_audio(processed_video_path, audio_path, narrated_clip_path, mix_audio=mix_audio_flag, verbose=args.verbose):
+            if not success or not combine_video_and_audio(processed_video_path, audio_path, narrated_clip_path, mix_audio=mix_audio_flag, media_volume=current_media_volume, verbose=args.verbose):
                 raise RuntimeError("FFmpeg compositing processing error.")
 
             slide_filename = f"slide_{i+1:02d}.mp4"
