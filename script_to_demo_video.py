@@ -94,16 +94,14 @@ def create_ass_file(text, duration, ass_path, font_size=12, color_choice="lightg
     centiseconds = int((duration % 1) * 100)
     end_time = f"{hours}:{minutes:02d}:{seconds:02d}.{centiseconds:02d}"
     
-    # Map simple color names to ASS format (&HAABBGGRR)
     colors = {
         "black": "&H00000000",
         "white": "&H00FFFFFF",
         "darkgray": "&H00333333",
         "lightgray": "&H00CCCCCC"
     }
-    primary_color = colors.get(color_choice.lower(), "&H00CCCCCC") # Default to lightgray
+    primary_color = colors.get(color_choice.lower(), "&H00CCCCCC") 
     
-    # Increased wrap length since the font defaults to a smaller size
     words = text.split()
     lines = []
     current_line = []
@@ -186,7 +184,7 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
         if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
-def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_file=None, verbose=False):
+def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_file=None, keep_audio=False, verbose=False):
     width, height = resolution.split('x')
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
     
@@ -195,9 +193,16 @@ def create_video_from_video(input_video_path, duration, output_path, resolution=
 
     command = [
         'ffmpeg', '-nostdin', '-stream_loop', '-1', '-i', input_video_path, 
-        '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 
-        '-an', '-t', str(duration), '-y', output_path
+        '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p'
     ]
+    
+    if not keep_audio:
+        command.append('-an')
+    else:
+        command.extend(['-c:a', 'aac', '-b:a', '192k'])
+
+    command.extend(['-t', str(duration), '-y', output_path])
+    
     try:
         subprocess.run(command, check=True, capture_output=True)
         return True
@@ -205,17 +210,43 @@ def create_video_from_video(input_video_path, duration, output_path, resolution=
         if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
-def combine_video_and_audio(video_path, audio_path, output_path, verbose=False):
-    command = [
-        'ffmpeg', '-nostdin', '-i', video_path, '-i', audio_path, '-c:v', 'copy',
-        '-c:a', 'aac', '-shortest', '-y', output_path
-    ]
+def combine_video_and_audio(video_path, audio_path, output_path, mix_audio=False, verbose=False):
+    """Merges video and audio, enforcing strict 44.1kHz Stereo so concat doesn't break."""
+    if mix_audio:
+        command = [
+            'ffmpeg', '-nostdin', '-i', video_path, '-i', audio_path, 
+            '-filter_complex', 
+            '[0:a]volume=0.3[bg];[1:a]volume=2.0[tts];[bg][tts]amix=inputs=2:duration=longest[aout]', 
+            '-map', '0:v:0', '-map', '[aout]', 
+            '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '44100', '-ac', '2', '-shortest', '-y', output_path
+        ]
+    else:
+        command = [
+            'ffmpeg', '-nostdin', '-i', video_path, '-i', audio_path, 
+            '-map', '0:v:0', '-map', '1:a:0',
+            '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '44100', '-ac', '2', '-shortest', '-y', output_path
+        ]
+        
     try:
         subprocess.run(command, check=True, capture_output=True)
         return True
     except subprocess.CalledProcessError as e:
-        if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
-        return False
+        if mix_audio:
+            logging.warning("\n   ⚠️  Audio mix failed (source video likely has no audio track). Falling back to TTS only.")
+            fallback_command = [
+                'ffmpeg', '-nostdin', '-i', video_path, '-i', audio_path, 
+                '-map', '0:v:0', '-map', '1:a:0',
+                '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '44100', '-ac', '2', '-shortest', '-y', output_path
+            ]
+            try:
+                subprocess.run(fallback_command, check=True, capture_output=True)
+                return True
+            except subprocess.CalledProcessError as e2:
+                if verbose: logging.error(e2.stderr.decode('utf-8', errors='ignore'))
+                return False
+        else:
+            if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
+            return False
 
 def concatenate_videos(video_paths, output_path, temp_dir, verbose=False):
     filelist_path = os.path.join(temp_dir, "filelist.txt")
@@ -246,7 +277,7 @@ async def main():
     parser.add_argument("--engine", choices=['edge', 'kokoro'], default='kokoro')
     parser.add_argument("--captions", action="store_true", help="Enable beautiful, styled slide-level captions.")
     parser.add_argument("--font-size", type=int, default=12, help="Font size for the on-screen captions (default: 12).")
-    parser.add_argument("--caption-color", choices=['black', 'white', 'darkgray', 'lightgray'], default='lightgray', help="Color of the caption text (default: darkgray).")
+    parser.add_argument("--caption-color", choices=['black', 'white', 'darkgray', 'lightgray'], default='lightgray', help="Color of the caption text.")
     parser.add_argument("--lang", default="en-US")
     parser.add_argument("--gender", choices=['male', 'female'], default='male')
     parser.add_argument("--volume", default="+0%")
@@ -324,14 +355,18 @@ async def main():
             
             full_script_text.append(text)
             
+            mix_audio_flag = section.get('mix_audio', section.get('media_audio_enabled', False))
+            
             print(f"\n🔷 [Section {i+1}/{len(script_data)}]")
             print(f"   📖 Text:  \"{text[:65]}...\"")
             print(f"   🖼️  Media: {media_path}")
+            if mix_audio_flag:
+                print(f"   🎵 Mixing: Original Media Audio Enabled")
             
             media_abs_path = os.path.join(script_dir, media_path)
             audio_ext = ".mp3" if args.engine == 'edge' else ".wav"
             audio_path = os.path.join(temp_dir, f"audio_{i}{audio_ext}")
-            silent_video_path = os.path.join(temp_dir, f"silent_video_{i}.mp4")
+            processed_video_path = os.path.join(temp_dir, f"processed_video_{i}.mp4")
             narrated_clip_path = os.path.join(temp_dir, f"narrated_clip_{i}.mp4")
 
             if not await generate_audio(text, args.engine, selected_voice, args.volume, audio_path, pipeline):
@@ -351,15 +386,19 @@ async def main():
                 captions_arg = None
 
             is_video = media_abs_path.lower().endswith(video_extensions)
+            
+            if not is_video:
+                mix_audio_flag = False
+
             if is_video:
-                success = create_video_from_video(media_abs_path, duration, silent_video_path, captions_file=captions_arg, verbose=args.verbose)
+                success = create_video_from_video(media_abs_path, duration, processed_video_path, captions_file=captions_arg, keep_audio=mix_audio_flag, verbose=args.verbose)
             else:
-                success = create_video_from_image(media_abs_path, duration, silent_video_path, captions_file=captions_arg, verbose=args.verbose)
+                success = create_video_from_image(media_abs_path, duration, processed_video_path, captions_file=captions_arg, verbose=args.verbose)
                 
             if os.path.exists(ass_filename):
                 os.remove(ass_filename)
 
-            if not success or not combine_video_and_audio(silent_video_path, audio_path, narrated_clip_path, verbose=args.verbose):
+            if not success or not combine_video_and_audio(processed_video_path, audio_path, narrated_clip_path, mix_audio=mix_audio_flag, verbose=args.verbose):
                 raise RuntimeError("FFmpeg compositing processing error.")
 
             slide_filename = f"slide_{i+1:02d}.mp4"
