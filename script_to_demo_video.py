@@ -168,7 +168,9 @@ def get_audio_duration_seconds(audio_path):
 
 def create_video_from_image(image_path, duration, output_path, resolution="1920x1080", captions_file=None, verbose=False):
     width, height = resolution.split('x')
-    video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
+    
+    # ENFORCED fps=30 so image slides perfectly match video slides
+    video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black,fps=30"
     
     if captions_file:
         video_filter += f",subtitles={captions_file}"
@@ -186,13 +188,15 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
 
 def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_file=None, keep_audio=False, verbose=False):
     width, height = resolution.split('x')
-    video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black"
+    
+    # ENFORCED fps=30 so video slides don't clash with image slides. tpad freezes the last frame.
+    video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black,fps=30,tpad=stop_mode=clone:stop=-1"
     
     if captions_file:
         video_filter += f",subtitles={captions_file}"
 
     command = [
-        'ffmpeg', '-nostdin', '-stream_loop', '-1', '-i', input_video_path, 
+        'ffmpeg', '-nostdin', '-i', input_video_path, 
         '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p'
     ]
     
@@ -211,12 +215,14 @@ def create_video_from_video(input_video_path, duration, output_path, resolution=
         return False
 
 def combine_video_and_audio(video_path, audio_path, output_path, mix_audio=False, media_volume=1.0, verbose=False):
-    """Merges video and audio, enforcing strict 44.1kHz Stereo so concat doesn't break."""
+    """Merges video and audio without stretching. Sample rates normalized to 44.1kHz."""
     if mix_audio:
         command = [
             'ffmpeg', '-nostdin', '-i', video_path, '-i', audio_path, 
             '-filter_complex', 
-            f'[0:a]volume={media_volume}[bg];[1:a]volume=2.0[tts];[bg][tts]amix=inputs=2:duration=longest[aout]', 
+            f'[0:a]aformat=sample_rates=44100:channel_layouts=stereo,volume={media_volume}[bg];'
+            f'[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=2.0[tts];'
+            f'[bg][tts]amix=inputs=2:duration=longest[aout]', 
             '-map', '0:v:0', '-map', '[aout]', 
             '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '44100', '-ac', '2', '-shortest', '-y', output_path
         ]
@@ -249,14 +255,16 @@ def combine_video_and_audio(video_path, audio_path, output_path, mix_audio=False
             return False
 
 def concatenate_videos(video_paths, output_path, temp_dir, verbose=False):
+    """Concatenates all slides into a final video. Re-encodes the final timeline to completely eliminate A/V sync drift."""
     filelist_path = os.path.join(temp_dir, "filelist.txt")
     with open(filelist_path, 'w') as f:
         for path in video_paths:
             safe_path = os.path.abspath(path).replace("'", "'\\''")
             f.write(f"file '{safe_path}'\n")
+            
     command = [
         'ffmpeg', '-nostdin', '-f', 'concat', '-safe', '0', '-i', os.path.abspath(filelist_path),
-        '-c', 'copy', '-y', output_path
+        '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k', '-y', output_path
     ]
     try:
         subprocess.run(command, check=True, capture_output=True)
