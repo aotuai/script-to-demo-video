@@ -29,8 +29,9 @@ cd script-to-demo-video
 python -m venv venv
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
 pip install edge-tts pydub kokoro soundfile
-*(Note: The first time you run the tool using the Kokoro engine, it will automatically download the 82M parameter model weights (~300MB) to your machine.)*
 ```
+*(Note: The first time you run the tool using the Kokoro engine, it will automatically download the 82M parameter model weights (~300MB) to your machine.)*
+
 ## Quick Start
 Create a JSON file (e.g., demo.json) containing your script and media paths. Then, run the following command:
 
@@ -41,6 +42,11 @@ python script_to_demo_video.py demo.json my_demo.mp4
 # Alternative: Uses Kokoro (local/private)
 python script_to_demo_video.py demo.json my_demo.mp4 --engine kokoro --voice am_fenrir
 ```
+We recommend Kooha for screen recording or OBS Studio for professionals.
+```bash
+flatpak install flathub io.github.seadve.Kooha
+flatpak run io.github.seadve.Kooha
+```
 ## The JSON Payload
 The script expects a JSON array of objects. Each object represents one "slide" or "section" of your video.
 
@@ -48,7 +54,7 @@ The script expects a JSON array of objects. Each object represents one "slide" o
 JSON
 [
     {
-        "text": "Welcome to the IT Helpdesk tutorial on connecting to the company VPN.",
+        "text": "Welcome to the IT Helpdesk tutorial on using BrainFrame AI.",
         "media": "assets/intro_slide.png"
     },
     {
@@ -70,7 +76,7 @@ This tool is designed to make recording complex screencasts easy by breaking the
 1. Draft the Script: Enter your script and the corresponding screenshot filenames into your JSON file in presentation order.
 1. Compile the Draft: Run the tool to generate the video and audio.
 1. Review the Output: Locate the newly created [output_name]_slides folder, which contains an individual .mp4 for each section.
-1. Record the Final Screen: Play the generated slides (e.g., slide_02.mp4) to listen to the TTS audio. Use a screen recorder to capture your actual screen, matching your actions to the audio's pacing. (Note: We recommend the built-in Ubuntu screen recorder if you don't need system audio, or Kooha/OBS Studio if you do.)
+1. Record the Final Screen: Play the generated slides (e.g., slide_02.mp4) to listen to the TTS audio. Use a screen recorder to capture your actual screen, matching your actions to the audio's pacing.
 1. Update and Re-compile: Update the JSON with your new video recording and run the compilation script once more to finalize the video.
 
 ## Command Line Arguments
@@ -85,6 +91,9 @@ You can customize the voice, volume, and output behavior using CLI flags.
 | `--gender` | Target gender if searching for a voice automatically (Edge only). | `male` |
 | `--lang` | Target locale if searching for a voice automatically (e.g., `en-GB`, `es-MX`) (Edge only). | `en-US` |
 | `--volume` | Volume adjustment for the TTS output. Use percentages (Edge only). | `+0%` |
+| `--captions` | Enables automatic subtitle generation and overlays them on the video. | `False` |
+| `--font-size` | Sets the font size for the video captions (requires `--captions`). | `24` |
+| `--font-color` | Sets the text color for the captions (e.g., `white`, `yellow`, `#FFFFFF`). | `white` |
 | `--list-voices`| Prints a formatted list of all available TTS voices for the Edge engine and exits. | None |
 | `--verbose` | Shows raw standard error output from FFmpeg for debugging. | `False` |
 
