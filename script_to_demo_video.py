@@ -350,15 +350,16 @@ async def main():
         sys.exit(1)
 
     temp_dir = create_temp_directory()
-    slides_export_dir = os.path.join(os.path.dirname(os.path.abspath(output_video_path)), f"{os.path.splitext(os.path.basename(output_video_path))[0]}_slides")
-    os.makedirs(slides_export_dir, exist_ok=True)
+    # Updated to save to a _chapters directory
+    chapters_export_dir = os.path.join(os.path.dirname(os.path.abspath(output_video_path)), f"{os.path.splitext(os.path.basename(output_video_path))[0]}_chapters")
+    os.makedirs(chapters_export_dir, exist_ok=True)
     
-    logging.info(f"📂 Slide Exports Target: {slides_export_dir}\n")
+    logging.info(f"📂 Chapter Exports Target: {chapters_export_dir}\n")
     
     narrated_clips = []
     full_script_text = []
     video_extensions = ('.mp4', '.mov', '.avi', '.mkv', '.webm')
-    current_video_time = 0.0  # Tracks the total timeline duration
+    current_video_time = 0.0  
     
     ass_filename = "temp_caption.ass"
     
@@ -367,6 +368,9 @@ async def main():
             slide_start = time.time()
             text = section.get('text')
             media_path = section.get('media') or section.get('image')
+            
+            # Inject chapter index back into the JSON object
+            section['chapter'] = i + 1
 
             if not text or not media_path:
                 continue
@@ -374,7 +378,7 @@ async def main():
             mix_audio_flag = section.get('mix_audio', section.get('media_audio_enabled', False))
             current_media_volume = section.get('media_volume', args.media_volume)
             
-            print(f"\n🔷 [Section {i+1}/{len(script_data)}]")
+            print(f"\n🔷 [Chapter {i+1}/{len(script_data)}]")
             print(f"   📖 Text:  \"{text[:65]}...\"")
             print(f"   🖼️  Media: {media_path}")
             if mix_audio_flag:
@@ -430,7 +434,9 @@ async def main():
             start_time_str = format_timestamp(current_video_time)
             end_time_str = format_timestamp(current_video_time + duration)
             clean_text_for_export = re.sub(r'\[PAUSE.*?\]', '', text).replace('  ', ' ').strip()
-            full_script_text.append(f"{start_time_str} - {end_time_str} | {clean_text_for_export}")
+            
+            # Formatted text script with Chapter tags included
+            full_script_text.append(f"Chapter {i+1}: {start_time_str} - {end_time_str} | {clean_text_for_export}")
             
             current_video_time += duration
             
@@ -457,15 +463,16 @@ async def main():
             if not success or not combine_video_and_audio(processed_video_path, audio_path, narrated_clip_path, mix_audio=mix_audio_flag, media_volume=current_media_volume, verbose=args.verbose):
                 raise RuntimeError("FFmpeg compositing processing error.")
 
-            slide_filename = f"slide_{i+1:02d}.mp4"
-            shutil.copy2(narrated_clip_path, os.path.join(slides_export_dir, slide_filename))
+            # Renamed exports to chapter_XX.mp4
+            chapter_filename = f"chapter_{i+1:02d}.mp4"
+            shutil.copy2(narrated_clip_path, os.path.join(chapters_export_dir, chapter_filename))
             narrated_clips.append(narrated_clip_path)
 
             slide_elapsed = time.time() - slide_start
-            print(f"   ⚡ Done:   {slide_filename} (Processed in {slide_elapsed:.2f}s)")
+            print(f"   ⚡ Done:   {chapter_filename} (Processed in {slide_elapsed:.2f}s)")
 
         if narrated_clips:
-            print("\n🎬 Sewing all generated slides into final showcase...")
+            print("\n🎬 Sewing all generated chapters into final showcase...")
             if concatenate_videos(narrated_clips, output_video_path, temp_dir, verbose=args.verbose):
                 with open(args.script_file, 'w') as f:
                     json.dump(script_data, f, indent=4)
