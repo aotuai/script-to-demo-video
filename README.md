@@ -8,338 +8,392 @@ You can now choose between Microsoft's high-speed cloud TTS (edge-tts) or a 100%
 
 ## Available TTS Voices
 ### Kokoro Local (Default)
-A fully private, on-device engine featuring high-quality American voices.
+A fully private, on-device engine featuring high-quality voices.
 
-- American Male: am_fenrir, am_adam, am_echo, am_eric, am_liam, am_michael
-- American Female: af_heart, af_alloy, af_aoede, af_bella, af_jessica, af_river
+Voice                            | Gender  | Locale   | Country / Language
+---------------------------------|---------|----------|-------------------
+af_heart (default)               | Female  | en-US    | United States 🇺🇸
+af_alloy                         | Female  | en-US    | United States 🇺🇸
+af_aoede                         | Female  | en-US    | United States 🇺🇸
+af_bella                         | Female  | en-US    | United States 🇺🇸
+af_jessica                       | Female  | en-US    | United States 🇺🇸
+af_kore                          | Female  | en-US    | United States 🇺🇸
+af_nicole                        | Female  | en-US    | United States 🇺🇸
+af_nova                          | Female  | en-US    | United States 🇺🇸
+af_river                         | Female  | en-US    | United States 🇺🇸
+af_sarah                         | Female  | en-US    | United States 🇺🇸
+af_sky                           | Female  | en-US    | United States 🇺🇸
+am_adam                          | Male    | en-US    | United States 🇺🇸
+am_echo                          | Male    | en-US    | United States 🇺🇸
+am_eric                          | Male    | en-US    | United States 🇺🇸
+am_fenrir                        | Male    | en-US    | United States 🇺🇸
+am_liam                          | Male    | en-US    | United States 🇺🇸
+am_michael                       | Male    | en-US    | United States 🇺🇸
+am_onyx                          | Male    | en-US    | United States 🇺🇸
+am_puck                          | Male    | en-US    | United States 🇺🇸
+am_santa                         | Male    | en-US    | United States 🇺🇸
+bf_alice                         | Female  | en-GB    | United Kingdom 🇬🇧
+bf_emma                          | Female  | en-GB    | United Kingdom 🇬🇧
+bf_isabella                      | Female  | en-GB    | United Kingdom 🇬🇧
+bf_lily                          | Female  | en-GB    | United Kingdom 🇬🇧
+bm_daniel                        | Male    | en-GB    | United Kingdom 🇬🇧
+bm_fable                         | Male    | en-GB    | United Kingdom 🇬🇧
+bm_george                        | Male    | en-GB    | United Kingdom 🇬🇧
+bm_lewis                         | Male    | en-GB    | United Kingdom 🇬🇧
+ef_dora                          | Female  | es-ES    | Spain 🇪🇸
+em_alex                          | Male    | es-ES    | Spain 🇪🇸
+em_santa                         | Male    | es-ES    | Spain 🇪🇸
+ff_siwis                         | Female  | fr-FR    | France 🇫🇷
+hf_alpha                         | Female  | hi-IN    | India 🇮🇳
+hf_beta                          | Female  | hi-IN    | India 🇮🇳
+hm_omega                         | Male    | hi-IN    | India 🇮🇳
+hm_psi                           | Male    | hi-IN    | India 🇮🇳
+if_sara                          | Female  | it-IT    | Italy 🇮🇹
+im_nicola                        | Male    | it-IT    | Italy 🇮🇹
+jf_alpha                         | Female  | ja-JP    | Japan 🇯🇵 (Needs misaki[ja])
+jf_gongitsune                    | Female  | ja-JP    | Japan 🇯🇵 (Needs misaki[ja])
+jf_nezumi                        | Female  | ja-JP    | Japan 🇯🇵 (Needs misaki[ja])
+jf_tebukuro                      | Female  | ja-JP    | Japan 🇯🇵 (Needs misaki[ja])
+jm_kumo                          | Male    | ja-JP    | Japan 🇯🇵 (Needs misaki[ja])
+pf_dora                          | Female  | pt-BR    | Brazil 🇧🇷
+pm_alex                          | Male    | pt-BR    | Brazil 🇧🇷
+pm_santa                         | Male    | pt-BR    | Brazil 🇧🇷
+zf_xiaobei                       | Female  | zh-CN    | China 🇨🇳 (Needs misaki[zh])
+zf_xiaoni                        | Female  | zh-CN    | China 🇨🇳 (Needs misaki[zh])
+zf_xiaoxiao                      | Female  | zh-CN    | China 🇨🇳 (Needs misaki[zh])
+zf_xiaoyi                        | Female  | zh-CN    | China 🇨🇳 (Needs misaki[zh])
+zm_yunjian                       | Male    | zh-CN    | China 🇨🇳 (Needs misaki[zh])
+zm_yunxi                         | Male    | zh-CN    | China 🇨🇳 (Needs misaki[zh])
+zm_yunxia                        | Male    | zh-CN    | China 🇨🇳 (Needs misaki[zh])
+zm_yunyang                       | Male    | zh-CN    | China 🇨🇳 (Needs misaki[zh])
 
 ### Edge-TTS (Microsoft Cloud)
 Use the --engine edge flag to access a massive library of high-speed, multilingual voices.
 
-voice | Gender | Local
--|-|-
-af-ZA-AdriNeural             | Female  | af-ZA
- af-ZA-WillemNeural           | Male    | af-ZA
- am-ET-MekdesNeural           | Female  | am-ET
- am-ET-AmehaNeural            | Male    | am-ET
- ar-AE-FatimaNeural           | Female  | ar-AE
- ar-AE-HamdanNeural           | Male    | ar-AE
- ar-BH-LailaNeural            | Female  | ar-BH
- ar-BH-AliNeural              | Male    | ar-BH
- ar-DZ-AminaNeural            | Female  | ar-DZ
- ar-DZ-IsmaelNeural           | Male    | ar-DZ
- ar-EG-SalmaNeural            | Female  | ar-EG
- ar-EG-ShakirNeural           | Male    | ar-EG
- ar-IQ-RanaNeural             | Female  | ar-IQ
- ar-IQ-BasselNeural           | Male    | ar-IQ
- ar-JO-SanaNeural             | Female  | ar-JO
- ar-JO-TaimNeural             | Male    | ar-JO
- ar-KW-NouraNeural            | Female  | ar-KW
- ar-KW-FahedNeural            | Male    | ar-KW
- ar-LB-LaylaNeural            | Female  | ar-LB
- ar-LB-RamiNeural             | Male    | ar-LB
- ar-LY-ImanNeural             | Female  | ar-LY
- ar-LY-OmarNeural             | Male    | ar-LY
- ar-MA-MounaNeural            | Female  | ar-MA
- ar-MA-JamalNeural            | Male    | ar-MA
- ar-OM-AyshaNeural            | Female  | ar-OM
- ar-OM-AbdullahNeural         | Male    | ar-OM
- ar-QA-AmalNeural             | Female  | ar-QA
- ar-QA-MoazNeural             | Male    | ar-QA
- ar-SA-ZariyahNeural          | Female  | ar-SA
- ar-SA-HamedNeural            | Male    | ar-SA
- ar-SY-AmanyNeural            | Female  | ar-SY
- ar-SY-LaithNeural            | Male    | ar-SY
- ar-TN-ReemNeural             | Female  | ar-TN
- ar-TN-HediNeural             | Male    | ar-TN
- ar-YE-MaryamNeural           | Female  | ar-YE
- ar-YE-SalehNeural            | Male    | ar-YE
- az-AZ-BanuNeural             | Female  | az-AZ
- az-AZ-BabekNeural            | Male    | az-AZ
- bg-BG-KalinaNeural           | Female  | bg-BG
- bg-BG-BorislavNeural         | Male    | bg-BG
- bn-BD-NabanitaNeural         | Female  | bn-BD
- bn-BD-PradeepNeural          | Male    | bn-BD
- bn-IN-TanishaaNeural         | Female  | bn-IN
- bn-IN-BashkarNeural          | Male    | bn-IN
- bs-BA-VesnaNeural            | Female  | bs-BA
- bs-BA-GoranNeural            | Male    | bs-BA
- ca-ES-JoanaNeural            | Female  | ca-ES
- ca-ES-EnricNeural            | Male    | ca-ES
- cs-CZ-VlastaNeural           | Female  | cs-CZ
- cs-CZ-AntoninNeural          | Male    | cs-CZ
- cy-GB-NiaNeural              | Female  | cy-GB
- cy-GB-AledNeural             | Male    | cy-GB
- da-DK-ChristelNeural         | Female  | da-DK
- da-DK-JeppeNeural            | Male    | da-DK
- de-AT-IngridNeural           | Female  | de-AT
- de-AT-JonasNeural            | Male    | de-AT
- de-CH-LeniNeural             | Female  | de-CH
- de-CH-JanNeural              | Male    | de-CH
- de-DE-AmalaNeural            | Female  | de-DE
- de-DE-KatjaNeural            | Female  | de-DE
- de-DE-SeraphinaMultilingualNeural | Female  | de-DE
- de-DE-ConradNeural           | Male    | de-DE
- de-DE-FlorianMultilingualNeural | Male    | de-DE
- de-DE-KillianNeural          | Male    | de-DE
- el-GR-AthinaNeural           | Female  | el-GR
- el-GR-NestorasNeural         | Male    | el-GR
- en-AU-NatashaNeural          | Female  | en-AU
- en-AU-WilliamMultilingualNeural | Male    | en-AU
- en-CA-ClaraNeural            | Female  | en-CA
- en-CA-LiamNeural             | Male    | en-CA
- en-GB-LibbyNeural            | Female  | en-GB
- en-GB-MaisieNeural           | Female  | en-GB
- en-GB-SoniaNeural            | Female  | en-GB
- en-GB-RyanNeural             | Male    | en-GB
- en-GB-ThomasNeural           | Male    | en-GB
- en-HK-YanNeural              | Female  | en-HK
- en-HK-SamNeural              | Male    | en-HK
- en-IE-EmilyNeural            | Female  | en-IE
- en-IE-ConnorNeural           | Male    | en-IE
- en-IN-NeerjaExpressiveNeural | Female  | en-IN
- en-IN-NeerjaNeural           | Female  | en-IN
- en-IN-PrabhatNeural          | Male    | en-IN
- en-KE-AsiliaNeural           | Female  | en-KE
- en-KE-ChilembaNeural         | Male    | en-KE
- en-NG-EzinneNeural           | Female  | en-NG
- en-NG-AbeoNeural             | Male    | en-NG
- en-NZ-MollyNeural            | Female  | en-NZ
- en-NZ-MitchellNeural         | Male    | en-NZ
- en-PH-RosaNeural             | Female  | en-PH
- en-PH-JamesNeural            | Male    | en-PH
- en-SG-LunaNeural             | Female  | en-SG
- en-SG-WayneNeural            | Male    | en-SG
- en-TZ-ImaniNeural            | Female  | en-TZ
- en-TZ-ElimuNeural            | Male    | en-TZ
- en-US-AnaNeural              | Female  | en-US
- en-US-AriaNeural             | Female  | en-US
- en-US-AvaMultilingualNeural  | Female  | en-US
- en-US-AvaNeural              | Female  | en-US
- en-US-EmmaMultilingualNeural | Female  | en-US
- en-US-EmmaNeural             | Female  | en-US
- en-US-JennyNeural            | Female  | en-US
- en-US-MichelleNeural         | Female  | en-US
- en-US-AndrewMultilingualNeural | Male    | en-US
- en-US-AndrewNeural           | Male    | en-US
- en-US-BrianMultilingualNeural | Male    | en-US
- en-US-BrianNeural            | Male    | en-US
- en-US-ChristopherNeural      | Male    | en-US
- en-US-EricNeural             | Male    | en-US
- en-US-GuyNeural              | Male    | en-US
- en-US-RogerNeural            | Male    | en-US
- en-US-SteffanNeural          | Male    | en-US
- en-ZA-LeahNeural             | Female  | en-ZA
- en-ZA-LukeNeural             | Male    | en-ZA
- es-AR-ElenaNeural            | Female  | es-AR
- es-AR-TomasNeural            | Male    | es-AR
- es-BO-SofiaNeural            | Female  | es-BO
- es-BO-MarceloNeural          | Male    | es-BO
- es-CL-CatalinaNeural         | Female  | es-CL
- es-CL-LorenzoNeural          | Male    | es-CL
- es-CO-SalomeNeural           | Female  | es-CO
- es-CO-GonzaloNeural          | Male    | es-CO
- es-CR-MariaNeural            | Female  | es-CR
- es-CR-JuanNeural             | Male    | es-CR
- es-CU-BelkysNeural           | Female  | es-CU
- es-CU-ManuelNeural           | Male    | es-CU
- es-DO-RamonaNeural           | Female  | es-DO
- es-DO-EmilioNeural           | Male    | es-DO
- es-EC-AndreaNeural           | Female  | es-EC
- es-EC-LuisNeural             | Male    | es-EC
- es-ES-ElviraNeural           | Female  | es-ES
- es-ES-XimenaNeural           | Female  | es-ES
- es-ES-AlvaroNeural           | Male    | es-ES
- es-GQ-TeresaNeural           | Female  | es-GQ
- es-GQ-JavierNeural           | Male    | es-GQ
- es-GT-MartaNeural            | Female  | es-GT
- es-GT-AndresNeural           | Male    | es-GT
- es-HN-KarlaNeural            | Female  | es-HN
- es-HN-CarlosNeural           | Male    | es-HN
- es-MX-DaliaNeural            | Female  | es-MX
- es-MX-JorgeNeural            | Male    | es-MX
- es-NI-YolandaNeural          | Female  | es-NI
- es-NI-FedericoNeural         | Male    | es-NI
- es-PA-MargaritaNeural        | Female  | es-PA
- es-PA-RobertoNeural          | Male    | es-PA
- es-PE-CamilaNeural           | Female  | es-PE
- es-PE-AlexNeural             | Male    | es-PE
- es-PR-KarinaNeural           | Female  | es-PR
- es-PR-VictorNeural           | Male    | es-PR
- es-PY-TaniaNeural            | Female  | es-PY
- es-PY-MarioNeural            | Male    | es-PY
- es-SV-LorenaNeural           | Female  | es-SV
- es-SV-RodrigoNeural          | Male    | es-SV
- es-US-PalomaNeural           | Female  | es-US
- es-US-AlonsoNeural           | Male    | es-US
- es-UY-ValentinaNeural        | Female  | es-UY
- es-UY-MateoNeural            | Male    | es-UY
- es-VE-PaolaNeural            | Female  | es-VE
- es-VE-SebastianNeural        | Male    | es-VE
- et-EE-AnuNeural              | Female  | et-EE
- et-EE-KertNeural             | Male    | et-EE
- fa-IR-DilaraNeural           | Female  | fa-IR
- fa-IR-FaridNeural            | Male    | fa-IR
- fi-FI-NooraNeural            | Female  | fi-FI
- fi-FI-HarriNeural            | Male    | fi-FI
- fil-PH-BlessicaNeural        | Female  | fil-PH
- fil-PH-AngeloNeural          | Male    | fil-PH
- fr-BE-CharlineNeural         | Female  | fr-BE
- fr-BE-GerardNeural           | Male    | fr-BE
- fr-CA-SylvieNeural           | Female  | fr-CA
- fr-CA-AntoineNeural          | Male    | fr-CA
- fr-CA-JeanNeural             | Male    | fr-CA
- fr-CA-ThierryNeural          | Male    | fr-CA
- fr-CH-ArianeNeural           | Female  | fr-CH
- fr-CH-FabriceNeural          | Male    | fr-CH
- fr-FR-DeniseNeural           | Female  | fr-FR
- fr-FR-EloiseNeural           | Female  | fr-FR
- fr-FR-VivienneMultilingualNeural | Female  | fr-FR
- fr-FR-HenriNeural            | Male    | fr-FR
- fr-FR-RemyMultilingualNeural | Male    | fr-FR
- ga-IE-OrlaNeural             | Female  | ga-IE
- ga-IE-ColmNeural             | Male    | ga-IE
- gl-ES-SabelaNeural           | Female  | gl-ES
- gl-ES-RoiNeural              | Male    | gl-ES
- gu-IN-DhwaniNeural           | Female  | gu-IN
- gu-IN-NiranjanNeural         | Male    | gu-IN
- he-IL-HilaNeural             | Female  | he-IL
- he-IL-AvriNeural             | Male    | he-IL
- hi-IN-SwaraNeural            | Female  | hi-IN
- hi-IN-MadhurNeural           | Male    | hi-IN
- hr-HR-GabrijelaNeural        | Female  | hr-HR
- hr-HR-SreckoNeural           | Male    | hr-HR
- hu-HU-NoemiNeural            | Female  | hu-HU
- hu-HU-TamasNeural            | Male    | hu-HU
- id-ID-GadisNeural            | Female  | id-ID
- id-ID-ArdiNeural             | Male    | id-ID
- is-IS-GudrunNeural           | Female  | is-IS
- is-IS-GunnarNeural           | Male    | is-IS
- it-IT-ElsaNeural             | Female  | it-IT
- it-IT-IsabellaNeural         | Female  | it-IT
- it-IT-DiegoNeural            | Male    | it-IT
- it-IT-GiuseppeMultilingualNeural | Male    | it-IT
- iu-Cans-CA-SiqiniqNeural     | Female  | iu-Cans-CA
- iu-Cans-CA-TaqqiqNeural      | Male    | iu-Cans-CA
- iu-Latn-CA-SiqiniqNeural     | Female  | iu-Latn-CA
- iu-Latn-CA-TaqqiqNeural      | Male    | iu-Latn-CA
- ja-JP-NanamiNeural           | Female  | ja-JP
- ja-JP-KeitaNeural            | Male    | ja-JP
- jv-ID-SitiNeural             | Female  | jv-ID
- jv-ID-DimasNeural            | Male    | jv-ID
- ka-GE-EkaNeural              | Female  | ka-GE
- ka-GE-GiorgiNeural           | Male    | ka-GE
- kk-KZ-AigulNeural            | Female  | kk-KZ
- kk-KZ-DauletNeural           | Male    | kk-KZ
- km-KH-SreymomNeural          | Female  | km-KH
- km-KH-PisethNeural           | Male    | km-KH
- kn-IN-SapnaNeural            | Female  | kn-IN
- kn-IN-GaganNeural            | Male    | kn-IN
- ko-KR-SunHiNeural            | Female  | ko-KR
- ko-KR-HyunsuMultilingualNeural | Male    | ko-KR
- ko-KR-InJoonNeural           | Male    | ko-KR
- lo-LA-KeomanyNeural          | Female  | lo-LA
- lo-LA-ChanthavongNeural      | Male    | lo-LA
- lt-LT-OnaNeural              | Female  | lt-LT
- lt-LT-LeonasNeural           | Male    | lt-LT
- lv-LV-EveritaNeural          | Female  | lv-LV
- lv-LV-NilsNeural             | Male    | lv-LV
- mk-MK-MarijaNeural           | Female  | mk-MK
- mk-MK-AleksandarNeural       | Male    | mk-MK
- ml-IN-SobhanaNeural          | Female  | ml-IN
- ml-IN-MidhunNeural           | Male    | ml-IN
- mn-MN-YesuiNeural            | Female  | mn-MN
- mn-MN-BataaNeural            | Male    | mn-MN
- mr-IN-AarohiNeural           | Female  | mr-IN
- mr-IN-ManoharNeural          | Male    | mr-IN
- ms-MY-YasminNeural           | Female  | ms-MY
- ms-MY-OsmanNeural            | Male    | ms-MY
- mt-MT-GraceNeural            | Female  | mt-MT
- mt-MT-JosephNeural           | Male    | mt-MT
- my-MM-NilarNeural            | Female  | my-MM
- my-MM-ThihaNeural            | Male    | my-MM
- nb-NO-PernilleNeural         | Female  | nb-NO
- nb-NO-FinnNeural             | Male    | nb-NO
- ne-NP-HemkalaNeural          | Female  | ne-NP
- ne-NP-SagarNeural            | Male    | ne-NP
- nl-BE-DenaNeural             | Female  | nl-BE
- nl-BE-ArnaudNeural           | Male    | nl-BE
- nl-NL-ColetteNeural          | Female  | nl-NL
- nl-NL-FennaNeural            | Female  | nl-NL
- nl-NL-MaartenNeural          | Male    | nl-NL
- pl-PL-ZofiaNeural            | Female  | pl-PL
- pl-PL-MarekNeural            | Male    | pl-PL
- ps-AF-LatifaNeural           | Female  | ps-AF
- ps-AF-GulNawazNeural         | Male    | ps-AF
- pt-BR-FranciscaNeural        | Female  | pt-BR
- pt-BR-ThalitaMultilingualNeural | Female  | pt-BR
- pt-BR-AntonioNeural          | Male    | pt-BR
- pt-PT-RaquelNeural           | Female  | pt-PT
- pt-PT-DuarteNeural           | Male    | pt-PT
- ro-RO-AlinaNeural            | Female  | ro-RO
- ro-RO-EmilNeural             | Male    | ro-RO
- ru-RU-SvetlanaNeural         | Female  | ru-RU
- ru-RU-DmitryNeural           | Male    | ru-RU
- si-LK-ThiliniNeural          | Female  | si-LK
- si-LK-SameeraNeural          | Male    | si-LK
- sk-SK-ViktoriaNeural         | Female  | sk-SK
- sk-SK-LukasNeural            | Male    | sk-SK
- sl-SI-PetraNeural            | Female  | sl-SI
- sl-SI-RokNeural              | Male    | sl-SI
- so-SO-UbaxNeural             | Female  | so-SO
- so-SO-MuuseNeural            | Male    | so-SO
- sq-AL-AnilaNeural            | Female  | sq-AL
- sq-AL-IlirNeural             | Male    | sq-AL
- sr-RS-SophieNeural           | Female  | sr-RS
- sr-RS-NicholasNeural         | Male    | sr-RS
- su-ID-TutiNeural             | Female  | su-ID
- su-ID-JajangNeural           | Male    | su-ID
- sv-SE-SofieNeural            | Female  | sv-SE
- sv-SE-MattiasNeural          | Male    | sv-SE
- sw-KE-ZuriNeural             | Female  | sw-KE
- sw-KE-RafikiNeural           | Male    | sw-KE
- sw-TZ-RehemaNeural           | Female  | sw-TZ
- sw-TZ-DaudiNeural            | Male    | sw-TZ
- ta-IN-PallaviNeural          | Female  | ta-IN
- ta-IN-ValluvarNeural         | Male    | ta-IN
- ta-LK-SaranyaNeural          | Female  | ta-LK
- ta-LK-KumarNeural            | Male    | ta-LK
- ta-MY-KaniNeural             | Female  | ta-MY
- ta-MY-SuryaNeural            | Male    | ta-MY
- ta-SG-VenbaNeural            | Female  | ta-SG
- ta-SG-AnbuNeural             | Male    | ta-SG
- te-IN-ShrutiNeural           | Female  | te-IN
- te-IN-MohanNeural            | Male    | te-IN
- th-TH-PremwadeeNeural        | Female  | th-TH
- th-TH-NiwatNeural            | Male    | th-TH
- tr-TR-EmelNeural             | Female  | tr-TR
- tr-TR-AhmetNeural            | Male    | tr-TR
- uk-UA-PolinaNeural           | Female  | uk-UA
- uk-UA-OstapNeural            | Male    | uk-UA
- ur-IN-GulNeural              | Female  | ur-IN
- ur-IN-SalmanNeural           | Male    | ur-IN
- ur-PK-UzmaNeural             | Female  | ur-PK
- ur-PK-AsadNeural             | Male    | ur-PK
- uz-UZ-MadinaNeural           | Female  | uz-UZ
- uz-UZ-SardorNeural           | Male    | uz-UZ
- vi-VN-HoaiMyNeural           | Female  | vi-VN
- vi-VN-NamMinhNeural          | Male    | vi-VN
- zh-CN-XiaoxiaoNeural         | Female  | zh-CN
- zh-CN-XiaoyiNeural           | Female  | zh-CN
- zh-CN-YunjianNeural          | Male    | zh-CN
- zh-CN-YunxiNeural            | Male    | zh-CN
- zh-CN-YunxiaNeural           | Male    | zh-CN
- zh-CN-YunyangNeural          | Male    | zh-CN
- zh-CN-liaoning-XiaobeiNeural | Female  | zh-CN-liaoning
- zh-CN-shaanxi-XiaoniNeural   | Female  | zh-CN-shaanxi
- zh-HK-HiuGaaiNeural          | Female  | zh-HK
- zh-HK-HiuMaanNeural          | Female  | zh-HK
- zh-HK-WanLungNeural          | Male    | zh-HK
- zh-TW-HsiaoChenNeural        | Female  | zh-TW
- zh-TW-HsiaoYuNeural          | Female  | zh-TW
- zh-TW-YunJheNeural           | Male    | zh-TW
- zu-ZA-ThandoNeural           | Female  | zu-ZA
- zu-ZA-ThembaNeural           | Male    | zu-ZA
+Voice                            | Gender  | Locale   | Country / Language
+---------------------------------|---------|----------|-------------------
+af-ZA-AdriNeural                 | Female  | af-ZA    | South Africa 🇿🇦
+af-ZA-WillemNeural               | Male    | af-ZA    | South Africa 🇿🇦
+am-ET-MekdesNeural               | Female  | am-ET    | Ethiopia 🇪🇹
+am-ET-AmehaNeural                | Male    | am-ET    | Ethiopia 🇪🇹
+ar-AE-FatimaNeural               | Female  | ar-AE    | UAE 🇦🇪
+ar-AE-HamdanNeural               | Male    | ar-AE    | UAE 🇦🇪
+ar-BH-LailaNeural                | Female  | ar-BH    | Bahrain 🇧🇭
+ar-BH-AliNeural                  | Male    | ar-BH    | Bahrain 🇧🇭
+ar-DZ-AminaNeural                | Female  | ar-DZ    | Algeria 🇩🇿
+ar-DZ-IsmaelNeural               | Male    | ar-DZ    | Algeria 🇩🇿
+ar-EG-SalmaNeural                | Female  | ar-EG    | Egypt 🇪🇬
+ar-EG-ShakirNeural               | Male    | ar-EG    | Egypt 🇪🇬
+ar-IQ-RanaNeural                 | Female  | ar-IQ    | Iraq 🇮🇶
+ar-IQ-BasselNeural               | Male    | ar-IQ    | Iraq 🇮🇶
+ar-JO-SanaNeural                 | Female  | ar-JO    | Jordan 🇯🇴
+ar-JO-TaimNeural                 | Male    | ar-JO    | Jordan 🇯🇴
+ar-KW-NouraNeural                | Female  | ar-KW    | Kuwait 🇰🇼
+ar-KW-FahedNeural                | Male    | ar-KW    | Kuwait 🇰🇼
+ar-LB-LaylaNeural                | Female  | ar-LB    | Lebanon 🇱🇧
+ar-LB-RamiNeural                 | Male    | ar-LB    | Lebanon 🇱🇧
+ar-LY-ImanNeural                 | Female  | ar-LY    | Libya 🇱🇾
+ar-LY-OmarNeural                 | Male    | ar-LY    | Libya 🇱🇾
+ar-MA-MounaNeural                | Female  | ar-MA    | Morocco 🇲🇦
+ar-MA-JamalNeural                | Male    | ar-MA    | Morocco 🇲🇦
+ar-OM-AyshaNeural                | Female  | ar-OM    | Oman 🇴🇲
+ar-OM-AbdullahNeural             | Male    | ar-OM    | Oman 🇴🇲
+ar-QA-AmalNeural                 | Female  | ar-QA    | Qatar 🇶🇦
+ar-QA-MoazNeural                 | Male    | ar-QA    | Qatar 🇶🇦
+ar-SA-ZariyahNeural              | Female  | ar-SA    | Saudi Arabia 🇸🇦
+ar-SA-HamedNeural                | Male    | ar-SA    | Saudi Arabia 🇸🇦
+ar-SY-AmanyNeural                | Female  | ar-SY    | Syria 🇸🇾
+ar-SY-LaithNeural                | Male    | ar-SY    | Syria 🇸🇾
+ar-TN-ReemNeural                 | Female  | ar-TN    | Tunisia 🇹🇳
+ar-TN-HediNeural                 | Male    | ar-TN    | Tunisia 🇹🇳
+ar-YE-MaryamNeural               | Female  | ar-YE    | Yemen 🇾🇪
+ar-YE-SalehNeural                | Male    | ar-YE    | Yemen 🇾🇪
+az-AZ-BanuNeural                 | Female  | az-AZ    | Azerbaijan 🇦🇿
+az-AZ-BabekNeural                | Male    | az-AZ    | Azerbaijan 🇦🇿
+bg-BG-KalinaNeural               | Female  | bg-BG    | Bulgaria 🇧🇬
+bg-BG-BorislavNeural             | Male    | bg-BG    | Bulgaria 🇧🇬
+bn-BD-NabanitaNeural             | Female  | bn-BD    | Bangladesh 🇧🇩
+bn-BD-PradeepNeural              | Male    | bn-BD    | Bangladesh 🇧🇩
+bn-IN-TanishaaNeural             | Female  | bn-IN    | India 🇮🇳
+bn-IN-BashkarNeural              | Male    | bn-IN    | India 🇮🇳
+bs-BA-VesnaNeural                | Female  | bs-BA    | Bosnia 🇧🇦
+bs-BA-GoranNeural                | Male    | bs-BA    | Bosnia 🇧🇦
+ca-ES-JoanaNeural                | Female  | ca-ES    | Spain 🇪🇸
+ca-ES-EnricNeural                | Male    | ca-ES    | Spain 🇪🇸
+cs-CZ-VlastaNeural               | Female  | cs-CZ    | Czechia 🇨🇿
+cs-CZ-AntoninNeural              | Male    | cs-CZ    | Czechia 🇨🇿
+cy-GB-NiaNeural                  | Female  | cy-GB    | United Kingdom 🇬🇧
+cy-GB-AledNeural                 | Male    | cy-GB    | United Kingdom 🇬🇧
+da-DK-ChristelNeural             | Female  | da-DK    | Denmark 🇩🇰
+da-DK-JeppeNeural                | Male    | da-DK    | Denmark 🇩🇰
+de-AT-IngridNeural               | Female  | de-AT    | Austria 🇦🇹
+de-AT-JonasNeural                | Male    | de-AT    | Austria 🇦🇹
+de-CH-LeniNeural                 | Female  | de-CH    | Switzerland 🇨🇭
+de-CH-JanNeural                  | Male    | de-CH    | Switzerland 🇨🇭
+de-DE-AmalaNeural                | Female  | de-DE    | Germany 🇩🇪
+de-DE-KatjaNeural                | Female  | de-DE    | Germany 🇩🇪
+de-DE-SeraphinaMultilingualNeural | Female  | de-DE    | Germany 🇩🇪
+de-DE-ConradNeural               | Male    | de-DE    | Germany 🇩🇪
+de-DE-FlorianMultilingualNeural  | Male    | de-DE    | Germany 🇩🇪
+de-DE-KillianNeural              | Male    | de-DE    | Germany 🇩🇪
+el-GR-AthinaNeural               | Female  | el-GR    | Greece 🇬🇷
+el-GR-NestorasNeural             | Male    | el-GR    | Greece 🇬🇷
+en-AU-NatashaNeural              | Female  | en-AU    | Australia 🇦🇺
+en-AU-WilliamMultilingualNeural  | Male    | en-AU    | Australia 🇦🇺
+en-CA-ClaraNeural                | Female  | en-CA    | Canada 🇨🇦
+en-CA-LiamNeural                 | Male    | en-CA    | Canada 🇨🇦
+en-GB-LibbyNeural                | Female  | en-GB    | United Kingdom 🇬🇧
+en-GB-MaisieNeural               | Female  | en-GB    | United Kingdom 🇬🇧
+en-GB-SoniaNeural                | Female  | en-GB    | United Kingdom 🇬🇧
+en-GB-RyanNeural                 | Male    | en-GB    | United Kingdom 🇬🇧
+en-GB-ThomasNeural               | Male    | en-GB    | United Kingdom 🇬🇧
+en-HK-YanNeural                  | Female  | en-HK    | Hong Kong 🇭🇰
+en-HK-SamNeural                  | Male    | en-HK    | Hong Kong 🇭🇰
+en-IE-EmilyNeural                | Female  | en-IE    | Ireland 🇮🇪
+en-IE-ConnorNeural               | Male    | en-IE    | Ireland 🇮🇪
+en-IN-NeerjaExpressiveNeural     | Female  | en-IN    | India 🇮🇳
+en-IN-NeerjaNeural               | Female  | en-IN    | India 🇮🇳
+en-IN-PrabhatNeural              | Male    | en-IN    | India 🇮🇳
+en-KE-AsiliaNeural               | Female  | en-KE    | Kenya 🇰🇪
+en-KE-ChilembaNeural             | Male    | en-KE    | Kenya 🇰🇪
+en-NG-EzinneNeural               | Female  | en-NG    | Nigeria 🇳🇬
+en-NG-AbeoNeural                 | Male    | en-NG    | Nigeria 🇳🇬
+en-NZ-MollyNeural                | Female  | en-NZ    | New Zealand 🇳🇿
+en-NZ-MitchellNeural             | Male    | en-NZ    | New Zealand 🇳🇿
+en-PH-RosaNeural                 | Female  | en-PH    | Philippines 🇵🇭
+en-PH-JamesNeural                | Male    | en-PH    | Philippines 🇵🇭
+en-SG-LunaNeural                 | Female  | en-SG    | Singapore 🇸🇬
+en-SG-WayneNeural                | Male    | en-SG    | Singapore 🇸🇬
+en-TZ-ImaniNeural                | Female  | en-TZ    | Tanzania 🇹🇿
+en-TZ-ElimuNeural                | Male    | en-TZ    | Tanzania 🇹🇿
+en-US-AnaNeural                  | Female  | en-US    | United States 🇺🇸
+en-US-AriaNeural                 | Female  | en-US    | United States 🇺🇸
+en-US-AvaMultilingualNeural      | Female  | en-US    | United States 🇺🇸
+en-US-AvaNeural                  | Female  | en-US    | United States 🇺🇸
+en-US-EmmaMultilingualNeural     | Female  | en-US    | United States 🇺🇸
+en-US-EmmaNeural                 | Female  | en-US    | United States 🇺🇸
+en-US-JennyNeural                | Female  | en-US    | United States 🇺🇸
+en-US-MichelleNeural             | Female  | en-US    | United States 🇺🇸
+en-US-AndrewMultilingualNeural   | Male    | en-US    | United States 🇺🇸
+en-US-AndrewNeural               | Male    | en-US    | United States 🇺🇸
+en-US-BrianMultilingualNeural    | Male    | en-US    | United States 🇺🇸
+en-US-BrianNeural                | Male    | en-US    | United States 🇺🇸
+en-US-ChristopherNeural          | Male    | en-US    | United States 🇺🇸
+en-US-EricNeural                 | Male    | en-US    | United States 🇺🇸
+en-US-GuyNeural                  | Male    | en-US    | United States 🇺🇸
+en-US-RogerNeural                | Male    | en-US    | United States 🇺🇸
+en-US-SteffanNeural              | Male    | en-US    | United States 🇺🇸
+en-ZA-LeahNeural                 | Female  | en-ZA    | South Africa 🇿🇦
+en-ZA-LukeNeural                 | Male    | en-ZA    | South Africa 🇿🇦
+es-AR-ElenaNeural                | Female  | es-AR    | Argentina 🇦🇷
+es-AR-TomasNeural                | Male    | es-AR    | Argentina 🇦🇷
+es-BO-SofiaNeural                | Female  | es-BO    | Bolivia 🇧🇴
+es-BO-MarceloNeural              | Male    | es-BO    | Bolivia 🇧🇴
+es-CL-CatalinaNeural             | Female  | es-CL    | Chile 🇨🇱
+es-CL-LorenzoNeural              | Male    | es-CL    | Chile 🇨🇱
+es-CO-SalomeNeural               | Female  | es-CO    | Colombia 🇨🇴
+es-CO-GonzaloNeural              | Male    | es-CO    | Colombia 🇨🇴
+es-CR-MariaNeural                | Female  | es-CR    | Costa Rica 🇨🇷
+es-CR-JuanNeural                 | Male    | es-CR    | Costa Rica 🇨🇷
+es-CU-BelkysNeural               | Female  | es-CU    | Cuba 🇨🇺
+es-CU-ManuelNeural               | Male    | es-CU    | Cuba 🇨🇺
+es-DO-RamonaNeural               | Female  | es-DO    | Dominican Rep. 🇩🇴
+es-DO-EmilioNeural               | Male    | es-DO    | Dominican Rep. 🇩🇴
+es-EC-AndreaNeural               | Female  | es-EC    | Ecuador 🇪🇨
+es-EC-LuisNeural                 | Male    | es-EC    | Ecuador 🇪🇨
+es-ES-ElviraNeural               | Female  | es-ES    | Spain 🇪🇸
+es-ES-XimenaNeural               | Female  | es-ES    | Spain 🇪🇸
+es-ES-AlvaroNeural               | Male    | es-ES    | Spain 🇪🇸
+es-GQ-TeresaNeural               | Female  | es-GQ    | Equatorial Guinea 🇬🇶
+es-GQ-JavierNeural               | Male    | es-GQ    | Equatorial Guinea 🇬🇶
+es-GT-MartaNeural                | Female  | es-GT    | Guatemala 🇬🇹
+es-GT-AndresNeural               | Male    | es-GT    | Guatemala 🇬🇹
+es-HN-KarlaNeural                | Female  | es-HN    | Honduras 🇭🇳
+es-HN-CarlosNeural               | Male    | es-HN    | Honduras 🇭🇳
+es-MX-DaliaNeural                | Female  | es-MX    | Mexico 🇲🇽
+es-MX-JorgeNeural                | Male    | es-MX    | Mexico 🇲🇽
+es-NI-YolandaNeural              | Female  | es-NI    | Nicaragua 🇳🇮
+es-NI-FedericoNeural             | Male    | es-NI    | Nicaragua 🇳🇮
+es-PA-MargaritaNeural            | Female  | es-PA    | Panama 🇵🇦
+es-PA-RobertoNeural              | Male    | es-PA    | Panama 🇵🇦
+es-PE-CamilaNeural               | Female  | es-PE    | Peru 🇵🇪
+es-PE-AlexNeural                 | Male    | es-PE    | Peru 🇵🇪
+es-PR-KarinaNeural               | Female  | es-PR    | Puerto Rico 🇵🇷
+es-PR-VictorNeural               | Male    | es-PR    | Puerto Rico 🇵🇷
+es-PY-TaniaNeural                | Female  | es-PY    | Paraguay 🇵🇾
+es-PY-MarioNeural                | Male    | es-PY    | Paraguay 🇵🇾
+es-SV-LorenaNeural               | Female  | es-SV    | El Salvador 🇸🇻
+es-SV-RodrigoNeural              | Male    | es-SV    | El Salvador 🇸🇻
+es-US-PalomaNeural               | Female  | es-US    | United States 🇺🇸
+es-US-AlonsoNeural               | Male    | es-US    | United States 🇺🇸
+es-UY-ValentinaNeural            | Female  | es-UY    | Uruguay 🇺🇾
+es-UY-MateoNeural                | Male    | es-UY    | Uruguay 🇺🇾
+es-VE-PaolaNeural                | Female  | es-VE    | Venezuela 🇻🇪
+es-VE-SebastianNeural            | Male    | es-VE    | Venezuela 🇻🇪
+et-EE-AnuNeural                  | Female  | et-EE    | Estonia 🇪🇪
+et-EE-KertNeural                 | Male    | et-EE    | Estonia 🇪🇪
+fa-IR-DilaraNeural               | Female  | fa-IR    | Iran 🇮🇷
+fa-IR-FaridNeural                | Male    | fa-IR    | Iran 🇮🇷
+fi-FI-NooraNeural                | Female  | fi-FI    | Finland 🇫🇮
+fi-FI-HarriNeural                | Male    | fi-FI    | Finland 🇫🇮
+fil-PH-BlessicaNeural            | Female  | fil-PH   | Philippines 🇵🇭
+fil-PH-AngeloNeural              | Male    | fil-PH   | Philippines 🇵🇭
+fr-BE-CharlineNeural             | Female  | fr-BE    | Belgium 🇧🇪
+fr-BE-GerardNeural               | Male    | fr-BE    | Belgium 🇧🇪
+fr-CA-SylvieNeural               | Female  | fr-CA    | Canada 🇨🇦
+fr-CA-AntoineNeural              | Male    | fr-CA    | Canada 🇨🇦
+fr-CA-JeanNeural                 | Male    | fr-CA    | Canada 🇨🇦
+fr-CA-ThierryNeural              | Male    | fr-CA    | Canada 🇨🇦
+fr-CH-ArianeNeural               | Female  | fr-CH    | Switzerland 🇨🇭
+fr-CH-FabriceNeural              | Male    | fr-CH    | Switzerland 🇨🇭
+fr-FR-DeniseNeural               | Female  | fr-FR    | France 🇫🇷
+fr-FR-EloiseNeural               | Female  | fr-FR    | France 🇫🇷
+fr-FR-VivienneMultilingualNeural | Female  | fr-FR    | France 🇫🇷
+fr-FR-HenriNeural                | Male    | fr-FR    | France 🇫🇷
+fr-FR-RemyMultilingualNeural     | Male    | fr-FR    | France 🇫🇷
+ga-IE-OrlaNeural                 | Female  | ga-IE    | Ireland 🇮🇪
+ga-IE-ColmNeural                 | Male    | ga-IE    | Ireland 🇮🇪
+gl-ES-SabelaNeural               | Female  | gl-ES    | Spain 🇪🇸
+gl-ES-RoiNeural                  | Male    | gl-ES    | Spain 🇪🇸
+gu-IN-DhwaniNeural               | Female  | gu-IN    | India 🇮🇳
+gu-IN-NiranjanNeural             | Male    | gu-IN    | India 🇮🇳
+he-IL-HilaNeural                 | Female  | he-IL    | Israel 🇮🇱
+he-IL-AvriNeural                 | Male    | he-IL    | Israel 🇮🇱
+hi-IN-SwaraNeural                | Female  | hi-IN    | India 🇮🇳
+hi-IN-MadhurNeural               | Male    | hi-IN    | India 🇮🇳
+hr-HR-GabrijelaNeural            | Female  | hr-HR    | Croatia 🇭🇷
+hr-HR-SreckoNeural               | Male    | hr-HR    | Croatia 🇭🇷
+hu-HU-NoemiNeural                | Female  | hu-HU    | Hungary 🇭🇺
+hu-HU-TamasNeural                | Male    | hu-HU    | Hungary 🇭🇺
+id-ID-GadisNeural                | Female  | id-ID    | Indonesia 🇮🇩
+id-ID-ArdiNeural                 | Male    | id-ID    | Indonesia 🇮🇩
+is-IS-GudrunNeural               | Female  | is-IS    | Iceland 🇮🇸
+is-IS-GunnarNeural               | Male    | is-IS    | Iceland 🇮🇸
+it-IT-ElsaNeural                 | Female  | it-IT    | Italy 🇮🇹
+it-IT-IsabellaNeural             | Female  | it-IT    | Italy 🇮🇹
+it-IT-DiegoNeural                | Male    | it-IT    | Italy 🇮🇹
+it-IT-GiuseppeMultilingualNeural | Male    | it-IT    | Italy 🇮🇹
+iu-Cans-CA-SiqiniqNeural         | Female  | iu-Cans-CA | Inuktitut (Syllabics, Canada)
+iu-Cans-CA-TaqqiqNeural          | Male    | iu-Cans-CA | Inuktitut (Syllabics, Canada)
+iu-Latn-CA-SiqiniqNeural         | Female  | iu-Latn-CA | Inuktitut (Latin, Canada)
+iu-Latn-CA-TaqqiqNeural          | Male    | iu-Latn-CA | Inuktitut (Latin, Canada)
+ja-JP-NanamiNeural               | Female  | ja-JP    | Japan 🇯🇵
+ja-JP-KeitaNeural                | Male    | ja-JP    | Japan 🇯🇵
+jv-ID-SitiNeural                 | Female  | jv-ID    | Indonesia 🇮🇩
+jv-ID-DimasNeural                | Male    | jv-ID    | Indonesia 🇮🇩
+ka-GE-EkaNeural                  | Female  | ka-GE    | Georgia 🇬🇪
+ka-GE-GiorgiNeural               | Male    | ka-GE    | Georgia 🇬🇪
+kk-KZ-AigulNeural                | Female  | kk-KZ    | Kazakhstan 🇰🇿
+kk-KZ-DauletNeural               | Male    | kk-KZ    | Kazakhstan 🇰🇿
+km-KH-SreymomNeural              | Female  | km-KH    | Cambodia 🇰🇭
+km-KH-PisethNeural               | Male    | km-KH    | Cambodia 🇰🇭
+kn-IN-SapnaNeural                | Female  | kn-IN    | India 🇮🇳
+kn-IN-GaganNeural                | Male    | kn-IN    | India 🇮🇳
+ko-KR-SunHiNeural                | Female  | ko-KR    | South Korea 🇰🇷
+ko-KR-HyunsuMultilingualNeural   | Male    | ko-KR    | South Korea 🇰🇷
+ko-KR-InJoonNeural               | Male    | ko-KR    | South Korea 🇰🇷
+lo-LA-KeomanyNeural              | Female  | lo-LA    | Laos 🇱🇦
+lo-LA-ChanthavongNeural          | Male    | lo-LA    | Laos 🇱🇦
+lt-LT-OnaNeural                  | Female  | lt-LT    | Lithuania 🇱🇹
+lt-LT-LeonasNeural               | Male    | lt-LT    | Lithuania 🇱🇹
+lv-LV-EveritaNeural              | Female  | lv-LV    | Latvia 🇱🇻
+lv-LV-NilsNeural                 | Male    | lv-LV    | Latvia 🇱🇻
+mk-MK-MarijaNeural               | Female  | mk-MK    | North Macedonia 🇲🇰
+mk-MK-AleksandarNeural           | Male    | mk-MK    | North Macedonia 🇲🇰
+ml-IN-SobhanaNeural              | Female  | ml-IN    | India 🇮🇳
+ml-IN-MidhunNeural               | Male    | ml-IN    | India 🇮🇳
+mn-MN-YesuiNeural                | Female  | mn-MN    | Mongolia 🇲🇳
+mn-MN-BataaNeural                | Male    | mn-MN    | Mongolia 🇲🇳
+mr-IN-AarohiNeural               | Female  | mr-IN    | India 🇮🇳
+mr-IN-ManoharNeural              | Male    | mr-IN    | India 🇮🇳
+ms-MY-YasminNeural               | Female  | ms-MY    | Malaysia 🇲🇾
+ms-MY-OsmanNeural                | Male    | ms-MY    | Malaysia 🇲🇾
+mt-MT-GraceNeural                | Female  | mt-MT    | Malta 🇲🇹
+mt-MT-JosephNeural               | Male    | mt-MT    | Malta 🇲🇹
+my-MM-NilarNeural                | Female  | my-MM    | Myanmar 🇲🇲
+my-MM-ThihaNeural                | Male    | my-MM    | Myanmar 🇲🇲
+nb-NO-PernilleNeural             | Female  | nb-NO    | Norway 🇳🇴
+nb-NO-FinnNeural                 | Male    | nb-NO    | Norway 🇳🇴
+ne-NP-HemkalaNeural              | Female  | ne-NP    | Nepal 🇳🇵
+ne-NP-SagarNeural                | Male    | ne-NP    | Nepal 🇳🇵
+nl-BE-DenaNeural                 | Female  | nl-BE    | Belgium 🇧🇪
+nl-BE-ArnaudNeural               | Male    | nl-BE    | Belgium 🇧🇪
+nl-NL-ColetteNeural              | Female  | nl-NL    | Netherlands 🇳🇱
+nl-NL-FennaNeural                | Female  | nl-NL    | Netherlands 🇳🇱
+nl-NL-MaartenNeural              | Male    | nl-NL    | Netherlands 🇳🇱
+pl-PL-ZofiaNeural                | Female  | pl-PL    | Poland 🇵🇱
+pl-PL-MarekNeural                | Male    | pl-PL    | Poland 🇵🇱
+ps-AF-LatifaNeural               | Female  | ps-AF    | Afghanistan 🇦🇫
+ps-AF-GulNawazNeural             | Male    | ps-AF    | Afghanistan 🇦🇫
+pt-BR-FranciscaNeural            | Female  | pt-BR    | Brazil 🇧🇷
+pt-BR-ThalitaMultilingualNeural  | Female  | pt-BR    | Brazil 🇧🇷
+pt-BR-AntonioNeural              | Male    | pt-BR    | Brazil 🇧🇷
+pt-PT-RaquelNeural               | Female  | pt-PT    | Portugal 🇵🇹
+pt-PT-DuarteNeural               | Male    | pt-PT    | Portugal 🇵🇹
+ro-RO-AlinaNeural                | Female  | ro-RO    | Romania 🇷🇴
+ro-RO-EmilNeural                 | Male    | ro-RO    | Romania 🇷🇴
+ru-RU-SvetlanaNeural             | Female  | ru-RU    | Russia 🇷🇺
+ru-RU-DmitryNeural               | Male    | ru-RU    | Russia 🇷🇺
+si-LK-ThiliniNeural              | Female  | si-LK    | Sri Lanka 🇱🇰
+si-LK-SameeraNeural              | Male    | si-LK    | Sri Lanka 🇱🇰
+sk-SK-ViktoriaNeural             | Female  | sk-SK    | Slovakia 🇸🇰
+sk-SK-LukasNeural                | Male    | sk-SK    | Slovakia 🇸🇰
+sl-SI-PetraNeural                | Female  | sl-SI    | Slovenia 🇸🇮
+sl-SI-RokNeural                  | Male    | sl-SI    | Slovenia 🇸🇮
+so-SO-UbaxNeural                 | Female  | so-SO    | Somalia 🇸🇴
+so-SO-MuuseNeural                | Male    | so-SO    | Somalia 🇸🇴
+sq-AL-AnilaNeural                | Female  | sq-AL    | Albania 🇦🇱
+sq-AL-IlirNeural                 | Male    | sq-AL    | Albania 🇦🇱
+sr-RS-SophieNeural               | Female  | sr-RS    | Serbia 🇷🇸
+sr-RS-NicholasNeural             | Male    | sr-RS    | Serbia 🇷🇸
+su-ID-TutiNeural                 | Female  | su-ID    | Indonesia 🇮🇩
+su-ID-JajangNeural               | Male    | su-ID    | Indonesia 🇮🇩
+sv-SE-SofieNeural                | Female  | sv-SE    | Sweden 🇸🇪
+sv-SE-MattiasNeural              | Male    | sv-SE    | Sweden 🇸🇪
+sw-KE-ZuriNeural                 | Female  | sw-KE    | Kenya 🇰🇪
+sw-KE-RafikiNeural               | Male    | sw-KE    | Kenya 🇰🇪
+sw-TZ-RehemaNeural               | Female  | sw-TZ    | Tanzania 🇹🇿
+sw-TZ-DaudiNeural                | Male    | sw-TZ    | Tanzania 🇹🇿
+ta-IN-PallaviNeural              | Female  | ta-IN    | India 🇮🇳
+ta-IN-ValluvarNeural             | Male    | ta-IN    | India 🇮🇳
+ta-LK-SaranyaNeural              | Female  | ta-LK    | Sri Lanka 🇱🇰
+ta-LK-KumarNeural                | Male    | ta-LK    | Sri Lanka 🇱🇰
+ta-MY-KaniNeural                 | Female  | ta-MY    | Malaysia 🇲🇾
+ta-MY-SuryaNeural                | Male    | ta-MY    | Malaysia 🇲🇾
+ta-SG-VenbaNeural                | Female  | ta-SG    | Singapore 🇸🇬
+ta-SG-AnbuNeural                 | Male    | ta-SG    | Singapore 🇸🇬
+te-IN-ShrutiNeural               | Female  | te-IN    | India 🇮🇳
+te-IN-MohanNeural                | Male    | te-IN    | India 🇮🇳
+th-TH-PremwadeeNeural            | Female  | th-TH    | Thailand 🇹🇭
+th-TH-NiwatNeural                | Male    | th-TH    | Thailand 🇹🇭
+tr-TR-EmelNeural                 | Female  | tr-TR    | Turkey 🇹🇷
+tr-TR-AhmetNeural                | Male    | tr-TR    | Turkey 🇹🇷
+uk-UA-PolinaNeural               | Female  | uk-UA    | Ukraine 🇺🇦
+uk-UA-OstapNeural                | Male    | uk-UA    | Ukraine 🇺🇦
+ur-IN-GulNeural                  | Female  | ur-IN    | India 🇮🇳
+ur-IN-SalmanNeural               | Male    | ur-IN    | India 🇮🇳
+ur-PK-UzmaNeural                 | Female  | ur-PK    | Pakistan 🇵🇰
+ur-PK-AsadNeural                 | Male    | ur-PK    | Pakistan 🇵🇰
+uz-UZ-MadinaNeural               | Female  | uz-UZ    | Uzbekistan 🇺🇿
+uz-UZ-SardorNeural               | Male    | uz-UZ    | Uzbekistan 🇺🇿
+vi-VN-HoaiMyNeural               | Female  | vi-VN    | Vietnam 🇻🇳
+vi-VN-NamMinhNeural              | Male    | vi-VN    | Vietnam 🇻🇳
+zh-CN-XiaoxiaoNeural             | Female  | zh-CN    | China 🇨🇳
+zh-CN-XiaoyiNeural               | Female  | zh-CN    | China 🇨🇳
+zh-CN-YunjianNeural              | Male    | zh-CN    | China 🇨🇳
+zh-CN-YunxiNeural                | Male    | zh-CN    | China 🇨🇳
+zh-CN-YunxiaNeural               | Male    | zh-CN    | China 🇨🇳
+zh-CN-YunyangNeural              | Male    | zh-CN    | China 🇨🇳
+zh-CN-liaoning-XiaobeiNeural     | Female  | zh-CN-liaoning | China 🇨🇳
+zh-CN-shaanxi-XiaoniNeural       | Female  | zh-CN-shaanxi | China 🇨🇳
+zh-HK-HiuGaaiNeural              | Female  | zh-HK    | Hong Kong 🇭🇰
+zh-HK-HiuMaanNeural              | Female  | zh-HK    | Hong Kong 🇭🇰
+zh-HK-WanLungNeural              | Male    | zh-HK    | Hong Kong 🇭🇰
+zh-TW-HsiaoChenNeural            | Female  | zh-TW    | Taiwan 🇹🇼
+zh-TW-HsiaoYuNeural              | Female  | zh-TW    | Taiwan 🇹🇼
+zh-TW-YunJheNeural               | Male    | zh-TW    | Taiwan 🇹🇼
+zu-ZA-ThandoNeural               | Female  | zu-ZA    | South Africa 🇿🇦
+zu-ZA-ThembaNeural               | Male    | zu-ZA    | South Africa 🇿🇦
 
 ## Why use this?
 - **Video-as-Code**: Keep your internal documentation and helpdesk videos in version control.

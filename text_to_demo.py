@@ -33,6 +33,46 @@ logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 # Clean, timestamp-free log format
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
+# --- Voice Dictionary ---
+KOKORO_VOICES = {
+    "🇺🇸 American English": {
+        "Female": ["af_heart (default)", "af_alloy", "af_aoede", "af_bella", "af_jessica", "af_kore", "af_nicole", "af_nova", "af_river", "af_sarah", "af_sky"],
+        "Male": ["am_adam", "am_echo", "am_eric", "am_fenrir", "am_liam", "am_michael", "am_onyx", "am_puck", "am_santa"]
+    },
+    "🇬🇧 British English": {
+        "Female": ["bf_alice", "bf_emma", "bf_isabella", "bf_lily"],
+        "Male": ["bm_daniel", "bm_fable", "bm_george", "bm_lewis"]
+    },
+    "🇪🇸 Spanish": {
+        "Female": ["ef_dora"],
+        "Male": ["em_alex", "em_santa"]
+    },
+    "🇫🇷 French": {
+        "Female": ["ff_siwis"],
+        "Male": []
+    },
+    "🇮🇳 Hindi": {
+        "Female": ["hf_alpha", "hf_beta"],
+        "Male": ["hm_omega", "hm_psi"]
+    },
+    "🇮🇹 Italian": {
+        "Female": ["if_sara"],
+        "Male": ["im_nicola"]
+    },
+    "🇯🇵 Japanese (Requires misaki[ja])": {
+        "Female": ["jf_alpha", "jf_gongitsune", "jf_nezumi", "jf_tebukuro"],
+        "Male": ["jm_kumo"]
+    },
+    "🇧🇷 Brazilian Portuguese": {
+        "Female": ["pf_dora"],
+        "Male": ["pm_alex", "pm_santa"]
+    },
+    "🇨🇳 Mandarin Chinese (Requires misaki[zh])": {
+        "Female": ["zf_xiaobei", "zf_xiaoni", "zf_xiaoxiao", "zf_xiaoyi"],
+        "Male": ["zm_yunjian", "zm_yunxi", "zm_yunxia", "zm_yunyang"]
+    }
+}
+
 # --- Helper Functions ---
 
 def format_timestamp(seconds):
@@ -45,14 +85,84 @@ def format_timestamp(seconds):
     return f"{minutes:02d}:{secs:02d}"
 
 async def display_voices():
-    """Lists all available voices from edge-tts in a readable format and exits."""
-    print("\n--- Available TTS Voices (Edge-TTS) ---")
-    print("Use the 'ShortName' with the --voice flag for precise selection.\n")
+    """Lists all available voices from edge-tts in a readable table format and exits."""
+    
+    # Map Edge-TTS locale codes to human-readable names with flags
+    FLAG_MAP = {
+        "af-ZA": "South Africa 🇿🇦", "am-ET": "Ethiopia 🇪🇹", "ar-AE": "UAE 🇦🇪",
+        "ar-BH": "Bahrain 🇧🇭", "ar-DZ": "Algeria 🇩🇿", "ar-EG": "Egypt 🇪🇬",
+        "ar-IQ": "Iraq 🇮🇶", "ar-JO": "Jordan 🇯🇴", "ar-KW": "Kuwait 🇰🇼",
+        "ar-LB": "Lebanon 🇱🇧", "ar-LY": "Libya 🇱🇾", "ar-MA": "Morocco 🇲🇦",
+        "ar-OM": "Oman 🇴🇲", "ar-QA": "Qatar 🇶🇦", "ar-SA": "Saudi Arabia 🇸🇦",
+        "ar-SY": "Syria 🇸🇾", "ar-TN": "Tunisia 🇹🇳", "ar-YE": "Yemen 🇾🇪",
+        "az-AZ": "Azerbaijan 🇦🇿", "bg-BG": "Bulgaria 🇧🇬", "bn-BD": "Bangladesh 🇧🇩",
+        "bn-IN": "India 🇮🇳", "bs-BA": "Bosnia 🇧🇦", "ca-ES": "Spain 🇪🇸",
+        "cs-CZ": "Czechia 🇨🇿", "cy-GB": "United Kingdom 🇬🇧", "da-DK": "Denmark 🇩🇰",
+        "de-AT": "Austria 🇦🇹", "de-CH": "Switzerland 🇨🇭", "de-DE": "Germany 🇩🇪",
+        "el-GR": "Greece 🇬🇷", "en-AU": "Australia 🇦🇺", "en-CA": "Canada 🇨🇦",
+        "en-GB": "United Kingdom 🇬🇧", "en-HK": "Hong Kong 🇭🇰", "en-IE": "Ireland 🇮🇪",
+        "en-IN": "India 🇮🇳", "en-KE": "Kenya 🇰🇪", "en-NG": "Nigeria 🇳🇬",
+        "en-NZ": "New Zealand 🇳🇿", "en-PH": "Philippines 🇵🇭", "en-SG": "Singapore 🇸🇬",
+        "en-TZ": "Tanzania 🇹🇿", "en-US": "United States 🇺🇸", "en-ZA": "South Africa 🇿🇦",
+        "es-AR": "Argentina 🇦🇷", "es-BO": "Bolivia 🇧🇴", "es-CL": "Chile 🇨🇱",
+        "es-CO": "Colombia 🇨🇴", "es-CR": "Costa Rica 🇨🇷", "es-CU": "Cuba 🇨🇺",
+        "es-DO": "Dominican Rep. 🇩🇴", "es-EC": "Ecuador 🇪🇨", "es-ES": "Spain 🇪🇸",
+        "es-GQ": "Equatorial Guinea 🇬🇶", "es-GT": "Guatemala 🇬🇹", "es-HN": "Honduras 🇭🇳",
+        "es-MX": "Mexico 🇲🇽", "es-NI": "Nicaragua 🇳🇮", "es-PA": "Panama 🇵🇦",
+        "es-PE": "Peru 🇵🇪", "es-PR": "Puerto Rico 🇵🇷", "es-PY": "Paraguay 🇵🇾",
+        "es-SV": "El Salvador 🇸🇻", "es-US": "United States 🇺🇸", "es-UY": "Uruguay 🇺🇾",
+        "es-VE": "Venezuela 🇻🇪", "et-EE": "Estonia 🇪🇪", "fa-IR": "Iran 🇮🇷",
+        "fi-FI": "Finland 🇫🇮", "fil-PH": "Philippines 🇵🇭", "fr-BE": "Belgium 🇧🇪",
+        "fr-CA": "Canada 🇨🇦", "fr-CH": "Switzerland 🇨🇭", "fr-FR": "France 🇫🇷",
+        "ga-IE": "Ireland 🇮🇪", "gl-ES": "Spain 🇪🇸", "gu-IN": "India 🇮🇳",
+        "he-IL": "Israel 🇮🇱", "hi-IN": "India 🇮🇳", "hr-HR": "Croatia 🇭🇷",
+        "hu-HU": "Hungary 🇭🇺", "id-ID": "Indonesia 🇮🇩", "is-IS": "Iceland 🇮🇸",
+        "it-IT": "Italy 🇮🇹", "ja-JP": "Japan 🇯🇵", "jv-ID": "Indonesia 🇮🇩",
+        "ka-GE": "Georgia 🇬🇪", "kk-KZ": "Kazakhstan 🇰🇿", "km-KH": "Cambodia 🇰🇭",
+        "kn-IN": "India 🇮🇳", "ko-KR": "South Korea 🇰🇷", "lo-LA": "Laos 🇱🇦",
+        "lt-LT": "Lithuania 🇱🇹", "lv-LV": "Latvia 🇱🇻", "mk-MK": "North Macedonia 🇲🇰",
+        "ml-IN": "India 🇮🇳", "mn-MN": "Mongolia 🇲🇳", "mr-IN": "India 🇮🇳",
+        "ms-MY": "Malaysia 🇲🇾", "mt-MT": "Malta 🇲🇹", "my-MM": "Myanmar 🇲🇲",
+        "nb-NO": "Norway 🇳🇴", "ne-NP": "Nepal 🇳🇵", "nl-BE": "Belgium 🇧🇪",
+        "nl-NL": "Netherlands 🇳🇱", "pl-PL": "Poland 🇵🇱", "ps-AF": "Afghanistan 🇦🇫",
+        "pt-BR": "Brazil 🇧🇷", "pt-PT": "Portugal 🇵🇹", "ro-RO": "Romania 🇷🇴",
+        "ru-RU": "Russia 🇷🇺", "si-LK": "Sri Lanka 🇱🇰", "sk-SK": "Slovakia 🇸🇰",
+        "sl-SI": "Slovenia 🇸🇮", "so-SO": "Somalia 🇸🇴", "sq-AL": "Albania 🇦🇱",
+        "sr-RS": "Serbia 🇷🇸", "su-ID": "Indonesia 🇮🇩", "sv-SE": "Sweden 🇸🇪",
+        "sw-KE": "Kenya 🇰🇪", "sw-TZ": "Tanzania 🇹🇿", "ta-IN": "India 🇮🇳",
+        "ta-LK": "Sri Lanka 🇱🇰", "ta-MY": "Malaysia 🇲🇾", "ta-SG": "Singapore 🇸🇬",
+        "te-IN": "India 🇮🇳", "th-TH": "Thailand 🇹🇭", "tr-TR": "Turkey 🇹🇷",
+        "uk-UA": "Ukraine 🇺🇦", "ur-IN": "India 🇮🇳", "ur-PK": "Pakistan 🇵🇰",
+        "uz-UZ": "Uzbekistan 🇺🇿", "vi-VN": "Vietnam 🇻🇳", "zh-CN": "China 🇨🇳",
+        "zh-CN-liaoning": "China 🇨🇳", "zh-CN-shaanxi": "China 🇨🇳", "zh-HK": "Hong Kong 🇭🇰",
+        "zh-TW": "Taiwan 🇹🇼", "zu-ZA": "South Africa 🇿🇦"
+    }
+
     try:
         voices = await edge_tts.list_voices()
         voices = sorted(voices, key=lambda v: (v['Locale'], v['Gender'], v['ShortName']))
+        
+        print("Voice                            | Gender  | Locale   | Country / Language")
+        print("---------------------------------|---------|----------|-------------------")
+        
         for voice in voices:
-            print(f"  - {voice.get('ShortName', 'N/A'):<28} | {voice.get('Gender', 'N/A'):<7} | {voice.get('Locale')}")
+            short_name = voice.get('ShortName', 'N/A')
+            gender = voice.get('Gender', 'N/A')
+            locale = voice.get('Locale', 'N/A')
+            
+            # Lookup the flag/country from our map, fallback to Microsoft's FriendlyName, then locale
+            if locale in FLAG_MAP:
+                country = FLAG_MAP[locale]
+            else:
+                friendly = voice.get('FriendlyName', '')
+                if " - " in friendly:
+                    country = friendly.split(" - ")[-1].strip()
+                else:
+                    country = locale
+                
+            print(f"{short_name:<32} | {gender:<7} | {locale:<8} | {country}")
+            
+        print("\nUse the exact 'Voice' name with the --voice flag (e.g., --voice en-US-AriaNeural)\n")
     except Exception as e:
         logging.error(f"❌ Could not retrieve voice list from edge-tts: {e}")
         sys.exit(1)
@@ -308,9 +418,29 @@ async def main():
         if args.engine == 'edge':
             await display_voices()
         else:
-            print("\n--- Available TTS Voices (Kokoro Local) ---")
-            print("American Male:   am_fenrir, am_adam, am_echo, am_eric, am_liam, am_michael")
-            print("American Female: af_heart, af_alloy, af_aoede, af_bella, af_jessica, af_river")
+            print("Voice                            | Gender  | Locale   | Country / Language")
+            print("---------------------------------|---------|----------|-------------------")
+            
+            # Helper mapping for the table visualization
+            locale_mapping = {
+                "🇺🇸 American English": ("en-US", "United States 🇺🇸"),
+                "🇬🇧 British English": ("en-GB", "United Kingdom 🇬🇧"),
+                "🇪🇸 Spanish": ("es-ES", "Spain 🇪🇸"),
+                "🇫🇷 French": ("fr-FR", "France 🇫🇷"),
+                "🇮🇳 Hindi": ("hi-IN", "India 🇮🇳"),
+                "🇮🇹 Italian": ("it-IT", "Italy 🇮🇹"),
+                "🇯🇵 Japanese (Requires misaki[ja])": ("ja-JP", "Japan 🇯🇵 (Needs misaki[ja])"),
+                "🇧🇷 Brazilian Portuguese": ("pt-BR", "Brazil 🇧🇷"),
+                "🇨🇳 Mandarin Chinese (Requires misaki[zh])": ("zh-CN", "China 🇨🇳 (Needs misaki[zh])")
+            }
+            
+            for lang_key, genders in KOKORO_VOICES.items():
+                locale, country = locale_mapping.get(lang_key, ("N/A", lang_key))
+                for gender, voices in genders.items():
+                    for voice in voices:
+                        print(f"{voice:<32} | {gender:<7} | {locale:<8} | {country}")
+                        
+            print("\nUse the exact 'Voice' name with the --voice flag (e.g., --voice bf_emma)\n")
         sys.exit(0)
     
     if not args.script_file:
@@ -333,8 +463,10 @@ async def main():
             selected_voice = await find_voice(args.gender, args.lang)
     else:
         logging.info("⚙️  Initializing Kokoro local pipeline mapping...")
-        pipeline = KPipeline(lang_code='a', repo_id='hexgrad/Kokoro-82M')
         selected_voice = args.voice if args.voice else 'am_fenrir'
+        # Detect the language dynamically based on the selected voice
+        lang_code = selected_voice[0].lower() if selected_voice else 'a'
+        pipeline = KPipeline(lang_code=lang_code, repo_id='hexgrad/Kokoro-82M')
     
     logging.info(f"🚀 ENGINE: {args.engine.upper()} | VOICE: {selected_voice} | CAPTIONS: {'ON (Size ' + str(args.font_size) + ', ' + args.caption_color + ')' if args.captions else 'OFF'}")
 
