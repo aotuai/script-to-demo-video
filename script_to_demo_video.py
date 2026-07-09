@@ -333,7 +333,7 @@ async def main():
             selected_voice = await find_voice(args.gender, args.lang)
     else:
         logging.info("⚙️  Initializing Kokoro local pipeline mapping...")
-        pipeline = KPipeline(lang_code='a')
+        pipeline = KPipeline(lang_code='a', repo_id='hexgrad/Kokoro-82M')
         selected_voice = args.voice if args.voice else 'am_fenrir'
     
     logging.info(f"🚀 ENGINE: {args.engine.upper()} | VOICE: {selected_voice} | CAPTIONS: {'ON (Size ' + str(args.font_size) + ', ' + args.caption_color + ')' if args.captions else 'OFF'}")
