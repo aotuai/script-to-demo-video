@@ -262,8 +262,8 @@ Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
 Style: Default,Arial,{font_size},{primary_color},&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,2,10,10,30,1
 
 [Events]
-Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:00.00,{end_time},Default,,0,0,0,,{wrapped_text}
+Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,{end_time},Default,,0000,0000,0000,,{wrapped_text}
 """
     with open(ass_path, 'w', encoding='utf-8') as f:
         f.write(ass_content)
