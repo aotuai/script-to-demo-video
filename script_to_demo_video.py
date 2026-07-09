@@ -35,6 +35,15 @@ logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 # --- Helper Functions ---
 
+def format_timestamp(seconds):
+    """Converts raw seconds into MM:SS or HH:MM:SS format for YouTube chapters."""
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    if hours > 0:
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+    return f"{minutes:02d}:{secs:02d}"
+
 async def display_voices():
     """Lists all available voices from edge-tts in a readable format and exits."""
     print("\n--- Available TTS Voices (Edge-TTS) ---")
@@ -170,7 +179,6 @@ def get_audio_duration_seconds(audio_path):
 def create_video_from_image(image_path, duration, output_path, resolution="1920x1080", captions_file=None, verbose=False):
     width, height = resolution.split('x')
     
-    # ENFORCED fps=30 so image slides perfectly match video slides
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black,fps=30"
     
     if captions_file:
@@ -190,7 +198,6 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
 def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_file=None, keep_audio=False, verbose=False):
     width, height = resolution.split('x')
     
-    # ENFORCED fps=30 so video slides don't clash with image slides. tpad freezes the last frame.
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black,fps=30,tpad=stop_mode=clone:stop=-1"
     
     if captions_file:
@@ -351,6 +358,7 @@ async def main():
     narrated_clips = []
     full_script_text = []
     video_extensions = ('.mp4', '.mov', '.avi', '.mkv', '.webm')
+    current_video_time = 0.0  # Tracks the total timeline duration
     
     ass_filename = "temp_caption.ass"
     
@@ -362,10 +370,6 @@ async def main():
 
             if not text or not media_path:
                 continue
-            
-            # Remove any PAUSE tags for the final clean text export
-            clean_text_for_export = re.sub(r'\[PAUSE.*?\]', '', text).replace('  ', ' ').strip()
-            full_script_text.append(clean_text_for_export)
             
             mix_audio_flag = section.get('mix_audio', section.get('media_audio_enabled', False))
             current_media_volume = section.get('media_volume', args.media_volume)
@@ -387,7 +391,6 @@ async def main():
             narrated_clip_path = os.path.join(temp_dir, f"narrated_clip_{i}.mp4")
 
             # --- Dynamic Text Chunking & Pause Injection ---
-            # Splits the text while keeping the PAUSE tags as separate elements in the list
             parts = re.split(r'(\[PAUSE.*?\])', text)
             full_audio = AudioSegment.empty()
             
@@ -398,7 +401,6 @@ async def main():
                     continue
                 
                 if part.startswith('[PAUSE'):
-                    # Extract numeric duration, default to 1.0 if not specified
                     match = re.search(r'\[PAUSE\s*([\d\.]+)\]', part)
                     if match:
                         pause_duration = float(match.group(1))
@@ -414,7 +416,6 @@ async def main():
                     full_audio += chunk_seg
                     chunk_idx += 1
                 
-            # Export the perfectly stitched audio track
             export_format = "mp3" if args.engine == 'edge' else "wav"
             full_audio.export(audio_path, format=export_format)
 
@@ -425,8 +426,15 @@ async def main():
             print(f"   🔊 Audio: {duration:.2f} seconds")
             section['duration'] = duration
             
+            # --- YouTube Chapter Timestamp Generation ---
+            start_time_str = format_timestamp(current_video_time)
+            end_time_str = format_timestamp(current_video_time + duration)
+            clean_text_for_export = re.sub(r'\[PAUSE.*?\]', '', text).replace('  ', ' ').strip()
+            full_script_text.append(f"{start_time_str} - {end_time_str} | {clean_text_for_export}")
+            
+            current_video_time += duration
+            
             if args.captions:
-                # Strip all [PAUSE] tags before generating subtitles so they don't show on screen
                 display_text = re.sub(r'\[PAUSE.*?\]', '', text).replace('  ', ' ').strip()
                 create_ass_file(display_text, duration, ass_filename, font_size=args.font_size, color_choice=args.caption_color)
                 captions_arg = ass_filename
@@ -465,7 +473,7 @@ async def main():
                 base_video_name = os.path.splitext(output_video_path)[0]
                 script_txt_path = f"{base_video_name}_script.txt"
                 with open(script_txt_path, 'w', encoding='utf-8') as f:
-                    f.write("\n\n".join(full_script_text))
+                    f.write("\n".join(full_script_text))
                 
                 total_elapsed = time.time() - total_start_time
                 print("=========================================================")
