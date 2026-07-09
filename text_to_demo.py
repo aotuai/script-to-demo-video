@@ -75,6 +75,22 @@ KOKORO_VOICES = {
 
 # --- Helper Functions ---
 
+def parse_lenient_json(file_path):
+    """Reads a JSON file and uses regex to strip trailing commas before loading."""
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    content = re.sub(r',\s*([\]}])', r'\1', content)
+    return json.loads(content)
+
+def generate_black_image(output_path, resolution="1920x1080"):
+    """Uses FFmpeg to generate a solid black placeholder image."""
+    width, height = resolution.split('x')
+    command = [
+        'ffmpeg', '-nostdin', '-f', 'lavfi', '-i', f'color=c=black:s={width}x{height}', 
+        '-vframes', '1', '-y', output_path
+    ]
+    subprocess.run(command, check=True, capture_output=True)
+
 def format_timestamp(seconds):
     """Converts raw seconds into MM:SS or HH:MM:SS format for YouTube chapters."""
     hours = int(seconds // 3600)
@@ -86,8 +102,6 @@ def format_timestamp(seconds):
 
 async def display_voices():
     """Lists all available voices from edge-tts in a readable table format and exits."""
-    
-    # Map Edge-TTS locale codes to human-readable names with flags
     FLAG_MAP = {
         "af-ZA": "South Africa 🇿🇦", "am-ET": "Ethiopia 🇪🇹", "ar-AE": "UAE 🇦🇪",
         "ar-BH": "Bahrain 🇧🇭", "ar-DZ": "Algeria 🇩🇿", "ar-EG": "Egypt 🇪🇬",
@@ -150,7 +164,6 @@ async def display_voices():
             gender = voice.get('Gender', 'N/A')
             locale = voice.get('Locale', 'N/A')
             
-            # Lookup the flag/country from our map, fallback to Microsoft's FriendlyName, then locale
             if locale in FLAG_MAP:
                 country = FLAG_MAP[locale]
             else:
@@ -195,11 +208,11 @@ def create_temp_directory(name="video_temp"):
     return name
 
 def validate_media_paths(script_data, script_dir):
-    """Checks if all media files referenced in the script exist before starting."""
+    """Checks if media files referenced in the script exist (skipping blank placeholders)."""
     all_found = True
     for i, section in enumerate(script_data):
         media_path = section.get('media') or section.get('image')
-        if not media_path:
+        if not media_path: 
             continue
         if not os.path.exists(os.path.join(script_dir, media_path)):
             logging.error(f"❌ File not found for Section {i+1}: {media_path}")
@@ -292,7 +305,9 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black,fps=30"
     
     if captions_file:
-        video_filter += f",subtitles={captions_file}"
+        # ABSOLUTE PATH & ESCAPING FOR FFMPEG: Slashes must be escaped so FFmpeg filter engine parses windows/linux paths cleanly
+        safe_captions_path = os.path.abspath(captions_file).replace('\\', '/').replace(':', '\\:')
+        video_filter += f",subtitles='{safe_captions_path}'"
         
     command = [
         'ffmpeg', '-nostdin', '-loop', '1', '-i', image_path, '-c:v', 'libx264', '-tune', 'stillimage',
@@ -311,11 +326,11 @@ def create_video_from_video(input_video_path, duration, output_path, resolution=
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black,fps=30,tpad=stop_mode=clone:stop=-1"
     
     if captions_file:
-        video_filter += f",subtitles={captions_file}"
+        safe_captions_path = os.path.abspath(captions_file).replace('\\', '/').replace(':', '\\:')
+        video_filter += f",subtitles='{safe_captions_path}'"
 
     command = ['ffmpeg', '-nostdin']
 
-    # Apply cuts before the input if specified
     if media_start is not None:
         command.extend(['-ss', str(media_start)])
     if media_end is not None:
@@ -426,7 +441,6 @@ async def main():
             print("Voice                            | Gender  | Locale   | Country / Language")
             print("---------------------------------|---------|----------|-------------------")
             
-            # Helper mapping for the table visualization
             locale_mapping = {
                 "🇺🇸 American English": ("en-US", "United States 🇺🇸"),
                 "🇬🇧 British English": ("en-GB", "United Kingdom 🇬🇧"),
@@ -469,15 +483,13 @@ async def main():
     else:
         logging.info("⚙️  Initializing Kokoro local pipeline mapping...")
         selected_voice = args.voice if args.voice else 'am_fenrir'
-        # Detect the language dynamically based on the selected voice
         lang_code = selected_voice[0].lower() if selected_voice else 'a'
         pipeline = KPipeline(lang_code=lang_code, repo_id='hexgrad/Kokoro-82M')
     
     logging.info(f"🚀 ENGINE: {args.engine.upper()} | VOICE: {selected_voice} | CAPTIONS: {'ON (Size ' + str(args.font_size) + ', ' + args.caption_color + ')' if args.captions else 'OFF'}")
 
     try:
-        with open(args.script_file, 'r') as f:
-            script_data = json.load(f)
+        script_data = parse_lenient_json(args.script_file)
     except Exception as e:
         logging.error(f"❌ Failed to parse script file: {e}")
         sys.exit(1)
@@ -487,7 +499,6 @@ async def main():
         sys.exit(1)
 
     temp_dir = create_temp_directory()
-    # Updated to save to a _chapters directory
     chapters_export_dir = os.path.join(os.path.dirname(os.path.abspath(output_video_path)), f"{os.path.splitext(os.path.basename(output_video_path))[0]}_chapters")
     os.makedirs(chapters_export_dir, exist_ok=True)
     
@@ -498,7 +509,8 @@ async def main():
     video_extensions = ('.mp4', '.mov', '.avi', '.mkv', '.webm')
     current_video_time = 0.0  
     
-    ass_filename = "temp_caption.ass"
+    # Target absolute path for captions
+    ass_filename = os.path.join(temp_dir, "temp_caption.ass")
     
     try:
         for i, section in enumerate(script_data):
@@ -506,12 +518,20 @@ async def main():
             text = section.get('text')
             media_path = section.get('media') or section.get('image')
             
-            # Inject chapter index back into the JSON object
             section['chapter'] = i + 1
 
-            if not text or not media_path:
+            if not text:
                 continue
             
+            is_placeholder_black_screen = False
+            if not media_path:
+                is_placeholder_black_screen = True
+                media_path = f"temp_black_placeholder_{i}.png"
+                generate_black_image(os.path.join(temp_dir, media_path))
+                media_abs_path = os.path.join(temp_dir, media_path)
+            else:
+                media_abs_path = os.path.join(script_dir, media_path)
+
             mix_audio_flag = section.get('mix_audio', section.get('media_audio_enabled', False))
             current_media_volume = section.get('media_volume', args.media_volume)
             media_start_sec = section.get('media_start')
@@ -519,21 +539,24 @@ async def main():
             
             print(f"\n🔷 [Chapter {i+1}/{len(script_data)}]")
             print(f"   📖 Text:  \"{text[:65]}...\"")
-            print(f"   🖼️  Media: {media_path}")
             
-            if media_start_sec is not None or media_end_sec is not None:
+            if is_placeholder_black_screen:
+                print(f"   🖼️  Media: [MISSING - Rendering Black Screen Placeholder]")
+            else:
+                print(f"   🖼️  Media: {media_path}")
+            
+            if (media_start_sec is not None or media_end_sec is not None) and not is_placeholder_black_screen:
                 s_log = media_start_sec if media_start_sec is not None else 0
                 e_log = media_end_sec if media_end_sec is not None else "end"
                 print(f"   ✂️  Cut:   {s_log}s to {e_log}s (Freezing last frame if TTS is longer)")
                 
-            if mix_audio_flag:
+            if mix_audio_flag and not is_placeholder_black_screen:
                 print(f"   🎵 Mixing: Original Media Audio Enabled (Volume: {current_media_volume})")
             
             pause_tags = re.findall(r'\[PAUSE.*?\]', text)
             if pause_tags:
                 print(f"   ⏱️  Padding: {len(pause_tags)} [PAUSE] tag(s) detected")
             
-            media_abs_path = os.path.join(script_dir, media_path)
             audio_ext = ".mp3" if args.engine == 'edge' else ".wav"
             audio_path = os.path.join(temp_dir, f"audio_{i}{audio_ext}")
             processed_video_path = os.path.join(temp_dir, f"processed_video_{i}.mp4")
@@ -580,19 +603,18 @@ async def main():
             end_time_str = format_timestamp(current_video_time + duration)
             clean_text_for_export = re.sub(r'\[PAUSE.*?\]', '', text).replace('  ', ' ').strip()
             
-            # Formatted text script with Chapter tags included
             full_script_text.append(f"Chapter {i+1}: {start_time_str} - {end_time_str} | {clean_text_for_export}")
             
             current_video_time += duration
             
-            if args.captions:
+            if args.captions or is_placeholder_black_screen:
                 display_text = re.sub(r'\[PAUSE.*?\]', '', text).replace('  ', ' ').strip()
                 create_ass_file(display_text, duration, ass_filename, font_size=args.font_size, color_choice=args.caption_color)
                 captions_arg = ass_filename
             else:
                 captions_arg = None
 
-            is_video = media_abs_path.lower().endswith(video_extensions)
+            is_video = media_abs_path.lower().endswith(video_extensions) if not is_placeholder_black_screen else False
             
             if not is_video:
                 mix_audio_flag = False
@@ -613,7 +635,6 @@ async def main():
             if not success or not combine_video_and_audio(processed_video_path, audio_path, narrated_clip_path, mix_audio=mix_audio_flag, media_volume=current_media_volume, verbose=args.verbose):
                 raise RuntimeError("FFmpeg compositing processing error.")
 
-            # Renamed exports to chapter_XX.mp4
             chapter_filename = f"chapter_{i+1:02d}.mp4"
             shutil.copy2(narrated_clip_path, os.path.join(chapters_export_dir, chapter_filename))
             narrated_clips.append(narrated_clip_path)
@@ -629,6 +650,7 @@ async def main():
                 
                 base_video_name = os.path.splitext(output_video_path)[0]
                 script_txt_path = f"{base_video_name}_script.txt"
+                full_script_text.append(f"\nDemo video made with AI: https://github.com/aotuai/text-to-demo\n")
                 with open(script_txt_path, 'w', encoding='utf-8') as f:
                     f.write("\n".join(full_script_text))
                 
