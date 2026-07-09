@@ -305,7 +305,7 @@ def create_video_from_image(image_path, duration, output_path, resolution="1920x
         if verbose: logging.error(e.stderr.decode('utf-8', errors='ignore'))
         return False
 
-def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_file=None, keep_audio=False, verbose=False):
+def create_video_from_video(input_video_path, duration, output_path, resolution="1920x1080", captions_file=None, keep_audio=False, media_start=None, media_end=None, verbose=False):
     width, height = resolution.split('x')
     
     video_filter = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad=width={width}:height={height}:x=(ow-iw)/2:y=(oh-ih)/2:color=black,fps=30,tpad=stop_mode=clone:stop=-1"
@@ -313,10 +313,15 @@ def create_video_from_video(input_video_path, duration, output_path, resolution=
     if captions_file:
         video_filter += f",subtitles={captions_file}"
 
-    command = [
-        'ffmpeg', '-nostdin', '-i', input_video_path, 
-        '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p'
-    ]
+    command = ['ffmpeg', '-nostdin']
+
+    # Apply cuts before the input if specified
+    if media_start is not None:
+        command.extend(['-ss', str(media_start)])
+    if media_end is not None:
+        command.extend(['-to', str(media_end)])
+
+    command.extend(['-i', input_video_path, '-vf', video_filter, '-c:v', 'libx264', '-pix_fmt', 'yuv420p'])
     
     if not keep_audio:
         command.append('-an')
@@ -509,10 +514,18 @@ async def main():
             
             mix_audio_flag = section.get('mix_audio', section.get('media_audio_enabled', False))
             current_media_volume = section.get('media_volume', args.media_volume)
+            media_start_sec = section.get('media_start')
+            media_end_sec = section.get('media_end')
             
             print(f"\n🔷 [Chapter {i+1}/{len(script_data)}]")
             print(f"   📖 Text:  \"{text[:65]}...\"")
             print(f"   🖼️  Media: {media_path}")
+            
+            if media_start_sec is not None or media_end_sec is not None:
+                s_log = media_start_sec if media_start_sec is not None else 0
+                e_log = media_end_sec if media_end_sec is not None else "end"
+                print(f"   ✂️  Cut:   {s_log}s to {e_log}s (Freezing last frame if TTS is longer)")
+                
             if mix_audio_flag:
                 print(f"   🎵 Mixing: Original Media Audio Enabled (Volume: {current_media_volume})")
             
@@ -585,7 +598,12 @@ async def main():
                 mix_audio_flag = False
 
             if is_video:
-                success = create_video_from_video(media_abs_path, duration, processed_video_path, captions_file=captions_arg, keep_audio=mix_audio_flag, verbose=args.verbose)
+                success = create_video_from_video(
+                    media_abs_path, duration, processed_video_path, 
+                    captions_file=captions_arg, keep_audio=mix_audio_flag, 
+                    media_start=media_start_sec, media_end=media_end_sec, 
+                    verbose=args.verbose
+                )
             else:
                 success = create_video_from_image(media_abs_path, duration, processed_video_path, captions_file=captions_arg, verbose=args.verbose)
                 
